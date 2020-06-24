@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>My SeedIn Portfolio</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <link href="css/style.css" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>    
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <strong><a class="navbar-brand" href="#">My SeedIn Portfolio</a></strong>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="investments.html">Investments</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="mydata.html">My Data</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="about.html">About</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main role="main" class="container-fluid"><style>
+table th, 
+table td {
+    min-width: 150px;
+}
+</style>
+<form onsubmit="return false;">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Add Investment</h2>
+            <div class="form-group">
+                <label for="projectId">Project ID</label>
+                <input type="text" class="form-control" id="projectId" placeholder="Unique ID as given by SeedIn">
+            </div>
+            <div class="form-group">
+                <label for="projectUrl">Project URL (optional)</label>
+                <input type="text" class="form-control" id="projectUrl" placeholder="Website URL to the project in SeedIn">
+                <small id="dateHelp" class="form-text text-muted">Go to SeedIn, open the project, copy URL and paste it here.</small>
+            </div>
+            <div class="form-group">
+                <label for="investedAmount">Invested Amount</label>
+                <input type="number" class="form-control" id="investedAmount" placeholder="₱" step="any">
+            </div>
+            <div class="form-group">
+                <label for="grossInterestRate">Gross Interest Rate per annum</label>
+                <input type="number" class="form-control" id="grossInterestRate" placeholder="1% to 20%" aria-describedby="grossInterestRateHelp" step="any">
+                <small id="grossInterestRateHelp" class="form-text text-muted">Subject to 20% tax and 10% risk management fee</small>
+            </div>
+            <div class="form-group">
+                <label for="projectDate">First Date of Payment Schedule</label>
+                <input type="text" class="form-control" id="projectDate" placeholder="yyyy-mm-dd">
+                <small id="dateHelp" class="form-text text-muted">Please check your seedin account for the date.</small>
+            </div>
+            <div class="form-group">
+                <label for="repaymentMethod">Repayment Method</label>
+                <select class="custom-select" id="repaymentMethod">
+                    <option>Equal</option>
+                    <option>Balloon</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tenure">Tenure</label>
+                <input type="number" class="form-control" id="tenure" placeholder="1 to 12 months">
+            </div>
+            <div class="form-group" style="text-align: right;">
+                <button id="cancelButton" class="btn btn-dark" onclick="history.back();">Cancel</button>
+                <button id="calculateButton" type="submit" class="btn btn-info" onclick="calculateDetails();">Calculate</button>
+                <button id="calculateButton" type="submit" class="btn btn-primary" onclick="addInvestment();">Add Investment</button>                
+            </div>
+        </div>
+        <div class="col-md-6"> 
+            <h2>Investment Details</h2>  
+            <div class="form-group">
+                <label for="netInterestRate">Net Interest Rate per annum</label>
+                <input type="text" class="form-control" id="netInterestRate" placeholder="..." readonly>
+            </div>
+            <div class="form-group">
+                <label for="netGainRate">Net Gain Rate after Tenure</label>
+                <input type="text" class="form-control" id="netGainRate" placeholder="..." readonly>
+            </div>                    
+            <div class="form-group">
+                <label for="netGainAmount">Net Gain Amount after Tenure</label>
+                <input type="text" class="form-control" id="netGainAmount" placeholder="..." readonly>
+            </div>
+            <p><strong>Repayment Schedule</strong></p>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Payment Date</th>
+                            <th>Net Interest</th>
+                            <th>Net Payout</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repaymentSchedules">
+                        <tr>
+                            <td>...</td>
+                            <td>...</td>
+                            <td>...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+<script src="scripts/mydate.js"></script>
+<script src="scripts/investment.js"></script>
+<script src="scripts/database.js"></script>
+<script src="scripts/numberutils.js"></script>
+<script>    
+    var database = new Database();
+    
+    // Validate and build the investment
+    function createInvestment() {
+        // Grab the inputs
+        var projectId = $.trim($("#projectId").val());
+        var investedAmount = $.trim($("#investedAmount").val());
+        var grossInterestRate = $.trim($("#grossInterestRate").val());
+        var date = $.trim($("#projectDate").val());
+        var repaymentMethod = $.trim($("#repaymentMethod").find(":selected").val());
+        var tenure = $.trim($("#tenure").val());
+
+        // Validate the project ID
+        var validationResult = Investment.validateProjectId(projectId);
+
+        if(!validationResult["status"]) {
+            alert(validationResult["message"]);
+            return null;
+        }
+
+        // Validate the invested amount
+        validationResult = Investment.validateInvestedAmount(investedAmount);
+
+        if(!validationResult["status"]) {
+            alert(validationResult["message"]);
+            return null;
+        }
+        
+        if(database.findInvestment(projectId) != null) {
+            alert("Another project has this ID already.");
+            return null;
+        }
+
+        // Validate the gross interest rate
+        validationResult = Investment.validateGrossInterestRate(grossInterestRate);
+
+        if(!validationResult["status"]) {
+            alert(validationResult["message"]);
+            return null;
+        }
+
+        // Validate the date
+        validationResult = Investment.validateDate(date);
+
+        if(!validationResult["status"]) {
+            alert(validationResult["message"]);
+            return null;
+        }
+
+        // Repayment method needs no validation...
+
+        // Validate tenure
+        validationResult = Investment.validateTenure(tenure);
+
+        if(!validationResult["status"]) {
+            alert(validationResult["message"]);
+            return null;
+        }
+
+        // Calculate the net interest rate
+        var investment = new Investment(projectId, 
+            parseFloat(investedAmount), 
+            parseFloat(grossInterestRate) / 100.0,  
+            MyDate.toMyDate(date), 
+            repaymentMethod, 
+            parseInt(tenure));
+
+        investment.properties["projectUrl"] = $("#projectUrl").val();
+        return investment;
+    }
+
+    // Add the investment to the database
+    function addInvestment() {
+        var investment = createInvestment();
+
+        if(investment == null)
+            return;
+
+        var database = new Database();
+        database.addInvestment(investment);
+        window.location.href = "investments.html";
+    }
+
+    // Calculate and validate the details
+    function calculateDetails() {
+        var investment = createInvestment();
+
+        if(investment == null)
+            return;
+        
+        $("#netInterestRate").val((investment.calculateNetInterestRate() * 100).toFixed(2) + "%");
+        $("#netGainRate").val((investment.calculateTenureInterestRate() * 100).toFixed(2) + "%");
+        $("#netGainAmount").val(NumberUtils.formatCurrency(investment.calculateNetGainAmount()));
+
+        // Calculate the repayment schedule
+        var repaymentSchedules = investment.generateRepaymentSchedule();
+
+        $("#repaymentSchedules").html("");
+
+        for(var i = 0; i < repaymentSchedules.length; i++) {
+            var schedule = repaymentSchedules[i];
+
+            $("#repaymentSchedules").append("<tr>"
+                + "<td>" + schedule["date"].toString() + "</td>"
+                + "<td>" + NumberUtils.formatCurrency(schedule["netInterestPayout"]) + "</td>"
+                + "<td>" + NumberUtils.formatCurrency(schedule["netPayout"]) + "</td>"
+                + "</tr>");
+        }
+    }
+</script>
+    </main>
+</body>
+</html>

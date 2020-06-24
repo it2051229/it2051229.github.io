@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>My SeedIn Portfolio</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <link href="css/style.css" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>    
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <strong><a class="navbar-brand" href="#">My SeedIn Portfolio</a></strong>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="investments.html">Investments</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="mydata.html">My Data</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="about.html">About</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main role="main" class="container-fluid"><div class="row">
+    <div class="col-md-12">
+        <h2>Dashboard</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <small class="form-text text-muted">From Date</small>
+        <input type="text" id="fromDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">
+    </div>
+    <div class="col-md-2">
+        <small class="form-text text-muted">To Date</small>
+        <input type="text" id="toDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">    
+    </div>
+    <div class="col-md-2">
+        <small class="form-text text-muted">Repayment Method</small>
+        <select id="repaymentMethod" class="custom-select" onchange="filterAndCalculateInvestments()">
+            <option>All</option>
+            <option>Balloon</option>
+            <option>Equal</option>
+        </select>
+    </div>    
+</div>
+<p></p>
+<div class="row">
+    <div class="col-md-6">
+        <form>
+            <div class="form-group">
+                <label>Amount Invested / Projected Net</label>
+                <div class="input-group">
+                    <input id="amountInvested" class="form-control form-control-lg" type="text" readonly>
+                    <div class="input-group-append">
+                        <span id="investmentGainIncrease" class="input-group-text">0.00% Gain</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">                
+                <label>Net Earnings</label>
+                <input id="netEarnings" class="form-control form-control-lg" type="text" readonly>
+            </div>
+            <div class="form-group">
+                <label>Net Payout</label>
+                <input id="netPayout" class="form-control form-control-lg" type="text" readonly>
+            </div>
+            <div class="form-group">
+                <label>Completed Projects</label>
+                <input id="completedProjects" class="form-control form-control-lg" type="text" readonly>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <form>
+            
+        </form>
+    </div>
+</div>
+<script src="scripts/mydate.js"></script>
+<script src="scripts/investment.js"></script>
+<script src="scripts/database.js"></script>
+<script src="scripts/numberutils.js"></script>
+<script>
+    var database = new Database();
+    var investments = []
+
+    // Calculate the dashboard
+    $(document).ready(function() {
+        // Load the earliest and latest dates
+        investments = database.getInvestments();
+        resetFields();
+
+        var dates = Investment.getEarliestAndLatestInvestmentDates(investments);
+
+        if(dates == null)
+            return;
+
+        $("#fromDate").val(dates["earliest"].toString());
+        $("#toDate").val(dates["latest"].toString());
+
+        filterAndCalculateInvestments();
+    });    
+
+    // Reset the fields
+    function resetFields() {
+        $("#amountInvested").val(NumberUtils.formatCurrency(0) + " / " + NumberUtils.formatCurrency(0));
+        $("#investmentGainIncrease").html("0% Gain");
+        $("#netEarnings").val(NumberUtils.formatCurrency(0) + " out of " + NumberUtils.formatCurrency(0));
+        $("#netPayout").val(NumberUtils.formatCurrency(0) + " out of " + NumberUtils.formatCurrency(0));
+        $("#completedProjects").val(0 + " out of " + 0);
+    }
+
+    // Filter all investments that fits on the given dates and calculate the dashboard elements
+    function filterAndCalculateInvestments() {
+        var earliestDate = MyDate.toMyDate($("#fromDate").val());
+        var latestDate = MyDate.toMyDate($("#toDate").val());
+        var repaymentMethod = $("#repaymentMethod").val();
+
+        if(earliestDate == null || latestDate == null) {
+            resetFields();
+            return;
+        }
+
+        // Get only investments at the given date range
+        var filteredInvestments = Investment.filterInvestmentsByDateAndRepaymentMethod(investments, earliestDate, latestDate, repaymentMethod);
+
+        var currentDate = MyDate.now();
+        var amountInvested = 0;
+        var completedNetEarnings = 0;
+        var netEarnings = 0;
+        var projectedNetAmount = 0;
+        var completedNetPayoutAmount = 0;
+        var completedProjects = 0;
+
+        for(var i = 0; i < filteredInvestments.length; i++) {
+            var investment = filteredInvestments[i];
+
+            // Break down each investment schedule and include only those schedule that is exactly in the
+            // date range, filters out months that
+            var schedules = investment.generateRepaymentSchedule();
+
+            if(schedules[schedules.length - 1]["date"].compareTo(currentDate) <= 0)
+                completedProjects++;
+            
+            for(var j = 0; j < schedules.length; j++) {
+                var schedule = schedules[j];
+
+                if(schedule["date"].compareTo(earliestDate) >= 0 && schedule["date"].compareTo(latestDate) <= 0) {
+                    projectedNetAmount += schedule["netPayout"];
+                    amountInvested += schedule["netPayout"] - schedule["netInterestPayout"];
+                    netEarnings += schedule["netInterestPayout"];
+
+                    if(schedule["date"].compareTo(currentDate) <= 0) {
+                        completedNetEarnings += schedule["netInterestPayout"];
+                        completedNetPayoutAmount += schedule["netPayout"];
+                    }
+                }
+            }
+        }
+
+        $("#amountInvested").val(NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount));
+        $("#investmentGainIncrease").html((((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2) + "% Gain");
+        $("#netEarnings").val(NumberUtils.formatCurrency(completedNetEarnings) + " out of " + NumberUtils.formatCurrency(netEarnings));
+        $("#netPayout").val(NumberUtils.formatCurrency(completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(projectedNetAmount));
+        $("#completedProjects").val(completedProjects + " out of " + filteredInvestments.length);
+    }
+</script>
+    </main>
+</body>
+</html>
