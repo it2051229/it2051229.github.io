@@ -40,60 +40,63 @@
     </div>
 </nav>
 
-<main role="main" class="container-fluid"><div class="row">
+<main role="main" class="container-fluid">
+<div class="row">
     <div class="col-md-12">
         <h2>Dashboard</h2>
     </div>
 </div>
 <div class="row">
-    <div class="col-md-2">
-        <small class="form-text text-muted">From Date</small>
-        <input type="date" id="fromDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">
-    </div>
-    <div class="col-md-2">
-        <small class="form-text text-muted">To Date</small>
-        <input type="date" id="toDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">    
-    </div>
-    <div class="col-md-2">
-        <small class="form-text text-muted">Repayment Method</small>
-        <select id="repaymentMethod" class="custom-select" onchange="filterAndCalculateInvestments()">
-            <option>All</option>
-            <option>Balloon</option>
-            <option>Equal</option>
-        </select>
-    </div>    
-</div>
-<p></p>
-<div class="row">
     <div class="col-md-6">
-        <form>
-            <div class="form-group">
-                <label>Amount Invested / Projected Net</label>
-                <div class="input-group">
-                    <input id="amountInvested" class="form-control form-control-lg" type="text" readonly>
-                    <div class="input-group-append">
-                        <span id="investmentGainIncrease" class="input-group-text">0.00% Gain</span>
+        <div class="row">
+            <div class="col-md-4">
+                <small class="form-text text-muted">From Date</small>
+                <input type="date" id="fromDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">
+            </div>
+            <div class="col-md-4">
+                <small class="form-text text-muted">To Date</small>
+                <input type="date" id="toDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">    
+            </div>
+            <div class="col-md-4">
+                <small class="form-text text-muted">Repayment Method</small>
+                <select id="repaymentMethod" class="custom-select" onchange="filterAndCalculateInvestments()">
+                    <option>All</option>
+                    <option>Balloon</option>
+                    <option>Equal</option>
+                </select>
+            </div>
+        </div>
+        <p></p>
+        <div class="row">
+            <div class="col-md-12">
+                <form>
+                    <div class="form-group">
+                        <label>Amount Invested / Projected Net</label>
+                        <div class="input-group">
+                            <input id="amountInvested" class="form-control form-control-lg" type="text" readonly>
+                            <div class="input-group-append">
+                                <span id="investmentGainIncrease" class="input-group-text">0.00% Gain</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    <div class="form-group">                
+                        <label>Net Earnings</label>
+                        <input id="netEarnings" class="form-control form-control-lg" type="text" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Net Payout</label>
+                        <input id="netPayout" class="form-control form-control-lg" type="text" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Completed Projects</label>
+                        <input id="completedProjects" class="form-control form-control-lg" type="text" readonly>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">                
-                <label>Net Earnings</label>
-                <input id="netEarnings" class="form-control form-control-lg" type="text" readonly>
-            </div>
-            <div class="form-group">
-                <label>Net Payout</label>
-                <input id="netPayout" class="form-control form-control-lg" type="text" readonly>
-            </div>
-            <div class="form-group">
-                <label>Completed Projects</label>
-                <input id="completedProjects" class="form-control form-control-lg" type="text" readonly>
-            </div>
-        </form>
+        </div>
     </div>
     <div class="col-md-6">
-        <form>
-            
-        </form>
+        <div id="notifications"></div>
     </div>
 </div>
 <script src="scripts/mydate.js"></script>
@@ -152,12 +155,20 @@
         var completedNetPayoutAmount = 0;
         var completedProjects = 0;
 
+        var numPayoutsToday = 0;
+        var totalNetEarningsToday = 0;
+        var totalPayoutAmountToday = 0;        
+        var numMaturedToday = 0;
+
         for(var i = 0; i < filteredInvestments.length; i++) {
             var investment = filteredInvestments[i];
 
             // Break down each investment schedule and include only those schedule that is exactly in the
             // date range, filters out months that
             var schedules = investment.generateRepaymentSchedule();
+            
+            if(schedules[schedules.length - 1]["date"].compareTo(currentDate) == 0)
+                numMaturedToday;
 
             if(schedules[schedules.length - 1]["date"].compareTo(currentDate) <= 0)
                 completedProjects++;
@@ -171,11 +182,19 @@
                     netEarnings += schedule["netInterestPayout"];
 
                     if(schedule["date"].compareTo(currentDate) <= 0) {
+                        if(schedule["date"].compareTo(currentDate) == 0) {
+                            numPayoutsToday++;
+                            totalNetEarningsToday += schedule["netInterestPayout"];
+                            totalPayoutAmountToday += schedule["netPayout"]; 
+                        }
+
                         completedNetEarnings += schedule["netInterestPayout"];
                         completedNetPayoutAmount += schedule["netPayout"];
                     }
                 }
             }
+
+
         }
 
         $("#amountInvested").val(NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount));
@@ -183,6 +202,20 @@
         $("#netEarnings").val(NumberUtils.formatCurrency(completedNetEarnings) + " out of " + NumberUtils.formatCurrency(netEarnings));
         $("#netPayout").val(NumberUtils.formatCurrency(completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(projectedNetAmount));
         $("#completedProjects").val(completedProjects + " out of " + filteredInvestments.length);
+
+        // Notice of payouts
+        if(numPayoutsToday > 0) {
+            var message = "<strong>Heads up!</strong> You have <strong>2 payout(s)</strong> today with a <strong>Total Net Earnings</strong> amount of ";
+            message += "<strong>" + NumberUtils.formatCurrency(totalNetEarningsToday) + "</strong> and <strong>Total Net Payout</strong> amount of ";
+            message += "<strong>" + NumberUtils.formatCurrency(totalPayoutAmountToday) + "</strong>. These amounts were already credited to this ";
+            message += "dashboard. Check that it matches your SeedIn account balance after SeedIn releases payouts.";
+
+            $("#notifications").append("<div class='alert alert-warning'>" + message + "</div>");
+        }
+
+        if(numMaturedToday > 0) {
+            $("#notifications").append("<div class='alert alert-success'><strong>Congratulations!</strong> You have <strong>" + numMaturedToday + " project(s)</strong> that reached the maturity date today.</div>");
+        }
     }
 </script>
     </main>
