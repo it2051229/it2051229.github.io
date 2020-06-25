@@ -50,6 +50,13 @@ table td {
     <div class="row">
         <div class="col-md-6">
             <h2>Add Investment</h2>
+            <div id="warningMessage" class="alert alert-warning" role="alert">
+                <button type="button" class="close" aria-label="Close" onclick="closeWarning()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Add only the investment if the project has been finalized</strong>. Meaning, there is already a scheduled
+                payment dates. Do not add the investment if it is still under subscription or on hold.
+            </div>
             <div class="form-group">
                 <label for="projectId">Project ID</label>
                 <input type="text" class="form-control" id="projectId" placeholder="Unique ID as given by SeedIn">
@@ -132,6 +139,21 @@ table td {
 <script src="scripts/numberutils.js"></script>
 <script>    
     var database = new Database();
+
+    // Anything we need to do before the user starts using the page
+    $(document).ready(function() {
+        $("#warningMessage").hide();
+
+        // Show the warning if it's the first time the user to use the page
+        if(!("investments.add.warningMessage" in localStorage))
+            $("#warningMessage").show();
+    });
+
+    // Close the warning dialog
+    function closeWarning() {
+        $("#warningMessage").hide();
+        localStorage.setItem("investments.add.warningMessage", true);
+    }
     
     // Validate and build the investment
     function createInvestment() {
@@ -241,6 +263,6 @@ table td {
         }
     }
 </script>
-    </main>
+</main>
 </body>
 </html>

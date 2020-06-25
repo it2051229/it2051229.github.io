@@ -63,6 +63,9 @@
             <label class="custom-file-label" for="importFile">Choose file...</label>
         </div>
         <p></p>
+        <h2>Reset</h2>
+        <p>Delete all your saved data on this web browser.</p>
+        <button class="btn btn-danger" onclick="clearData()">Clear My Data</button>
     </div>
 </div>
 <div id="downloadArea"></div>
@@ -94,10 +97,12 @@
 
         fileReader.onload = function() {
             try {
-                if(database.importJson(JSON.parse(fileReader.result)))
+                if(database.importJson(JSON.parse(fileReader.result))) {
                     alert("Import successful.");
-                else
+                    window.location.href = "dashboard.html";
+                } else {
                     alert("Import failed.");
+                }
             } catch(err) {
                 console.log(err);
                 alert("Invalid file.");
@@ -105,6 +110,16 @@
         }
         
         fileReader.readAsText($("#importFile")[0].files[0])
+    }
+
+    // Clear all data
+    function clearData() {
+        if(!confirm("Are you sure you want to clear your data?"))
+            return;
+
+        localStorage.clear();
+        alert("Clear successful.");
+        window.location.href = "dashboard.html";
     }
 </script>        
     </main>
