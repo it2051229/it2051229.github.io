@@ -142,6 +142,14 @@
         $("#fromDate").val(dates["earliest"].toString());
         $("#toDate").val(dates["latest"].toString());
 
+        // Set the ordering
+        if("investments.sortedBy" in localStorage)
+            $("#sortedBy").val(localStorage.getItem("investments.sortedBy"));
+
+        if("investments.sortOrder" in localStorage)
+            $("#sortOrder").val(localStorage.getItem("investments.sortOrder"));
+
+
         sortAndFilterInvestments();
     });
 
@@ -162,6 +170,10 @@
         // Sort it
         var sortedBy = $("#sortedBy").find(":selected").val();
         var sortOrder = $("#sortOrder").find(":selected").val();
+
+        // Save sort option
+        localStorage.setItem("investments.sortedBy", sortedBy);
+        localStorage.setItem("investments.sortOrder", sortOrder);
 
         // Sort in Ascending by default
         filteredInvestments.sort(function(investmentA, investmentB) {
