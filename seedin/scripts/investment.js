@@ -10,6 +10,7 @@ class Investment {
             "repaymentMethod": repaymentMethod,
             "tenure": tenure,
             "projectUrl": "",
+            "issuer": ""
         };
     }
 
@@ -22,7 +23,8 @@ class Investment {
             "date": this.properties["date"].toJson(),
             "repaymentMethod": this.properties["repaymentMethod"],
             "tenure": this.properties["tenure"],
-            "projectUrl": this.properties["projectUrl"]
+            "projectUrl": this.properties["projectUrl"],
+            "issuer": this.properties["issuer"]
         };
     }
 
@@ -225,10 +227,11 @@ class Investment {
             json["grossInterestRate"],
             MyDate.jsonToObject(json["date"]),
             json["repaymentMethod"],
-            json["tenure"],
+            json["tenure"]
         );
 
         investment.properties["projectUrl"] = json["projectUrl"];
+        investment.properties["issuer"] = json["issuer"];
         return investment;
     }
 
@@ -258,14 +261,47 @@ class Investment {
         }
     }
     
-    // Return all investments that lies on the given start and end date, including those that
-    // overlaps with the start and end date
-    static filterInvestmentsByDateAndRepaymentMethod(investments, startDate, endDate, repaymentMethod) {
+    // Return all investments that lies on the given start and end date
+    static filterInvestmentsByDate(investments, startDate, endDate) {
         return investments.filter(function(investment) {
-            return (investment.calculateMaturityDate().compareTo(startDate) >= 0)
-                && investment.properties["date"].compareTo(endDate) <= 0
-                && (repaymentMethod == "All" ||
-                    repaymentMethod == investment.properties["repaymentMethod"]);
+            return investment.calculateMaturityDate().compareTo(startDate) >= 0
+                && investment.properties["date"].compareTo(endDate) <= 0;
+               
         });
+    }
+
+    // Return all investment that matches the repayment method
+    static filterInvestmentsByRepaymentMethod(investments, repaymentMethod) {
+        return investments.filter(function(investment) {
+            return repaymentMethod == "All" 
+                || repaymentMethod == investment.properties["repaymentMethod"];
+        });
+    }
+
+    // Return all investment that matches the issuer
+    static filterInvestmentsByIssuer(investments, issuer) {
+        return investments.filter(function(investment) {
+            return issuer == "All"
+                || issuer == investment.properties["issuer"];
+        });
+    }
+
+    // Get all unique issuers from the list of investments
+    static getIssuers(investments) {
+        var issuers = [];
+
+        for(var i = 0; i < investments.length; i++) {
+            var investment = investments[i];
+
+            if("issuer" in investment.properties && investment.properties["issuer"] != "") {
+                var issuer = investment.properties["issuer"];
+                
+                if(issuers.indexOf(issuer) <= -1)
+                    issuers.push(issuer);
+            }
+        }
+
+        issuers.sort();
+        return issuers;
     }
 }

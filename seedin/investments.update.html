@@ -55,6 +55,31 @@ table td {
                 <input type="text" class="form-control" id="projectId" placeholder="Unique ID as given by SeedIn" readonly>
             </div>
             <div class="form-group">
+                <label for="issuer">Borrower Name (optional but recommended)</label>                
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="issuer" placeholder="Loanee">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-dark" type="button" id="button-addon2" data-toggle="modal" data-target="#chooseIssuerModal">Choose</button>
+                    </div>
+                </div>
+                <div class="modal fade" id="chooseIssuerModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog" rol="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Choose Issuer</h5>
+                            </div>
+                            <div id="issuers" class="modal-body">
+                                There are no available issuers. Don't worry, as you go on and add new investment
+                                we'll remember the issuers for you.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-seconary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="projectUrl">Project URL (optional)</label>
                 <div class="input-group">
                     <input type="text" class="form-control" id="projectUrl" placeholder="Website URL to the project in SeedIn">
@@ -164,9 +189,32 @@ table td {
         $("#repaymentMethod").val(investment.properties["repaymentMethod"]);
         $("#tenure").val(investment.properties["tenure"]);
         $("#projectUrl").val(investment.properties["projectUrl"]);
+        $("#issuer").val(investment.properties["issuer"]);
 
+        // Initialize the issuers to the modal dialog
+        var issuers = Investment.getIssuers(database.getInvestments());
+
+        if(issuers.length == 0)
+            return;
+
+        var issuersHtml = $("<div class='list-group'></div>");
+        
+        for(var i = 0; i < issuers.length; i++) {
+            var issuer = issuers[i];
+            issuersHtml.append("<a href='javascript:selectIssuer(\"" +  issuer + "\")' class='list-group-item list-group-item-action'>" + issuer + "</a>");
+        }
+
+        $("#issuers").html(issuersHtml);
+
+        // Display the details
         calculateDetails();
     });
+
+    // Put the selected issuer name into the input field
+    function selectIssuer(issuer) {
+        $("#chooseIssuerModal").modal("hide");
+        $("#issuer").val(issuer);
+    }
 
     // Delete the investment upon confirmation
     function deleteInvestment() {
@@ -244,6 +292,7 @@ table td {
             parseInt(tenure));
 
         investment.properties["projectUrl"] = $("#projectUrl").val();
+        investment.properties["issuer"] = $("#issuer").val().toUpperCase();
         return investment;
     }
 

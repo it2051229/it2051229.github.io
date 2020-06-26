@@ -50,68 +50,71 @@
 <div class="row">
     <div class="col-md-12">
         <h2>Dashboard</h2>
+        <div id="notifications"></div>
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6">
-        <div class="row">
-            <div class="col-md-4">
-                <small class="form-text text-muted">From Date</small>
-                <input type="date" id="fromDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">
+    <div class="col-md-2">
+        <small class="form-text text-muted">From Date</small>
+        <input type="date" id="fromDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">
+    </div>
+    <div class="col-md-2">
+        <small class="form-text text-muted">To Date</small>
+        <input type="date" id="toDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">    
+    </div>
+    <div class="col-md-2">
+        <small class="form-text text-muted">Repayment Method</small>
+        <select id="repaymentMethod" class="custom-select" onchange="filterAndCalculateInvestments()">
+            <option>All</option>
+            <option>Balloon</option>
+            <option>Equal</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <small class="form-text text-muted">Issuer</small>
+        <select id="issuer" class="custom-select" onchange="filterAndCalculateInvestments()">
+            <option>All</option>
+        </select>
+    </div>
+</div>
+<p></p>
+<div class="row">
+    <div class="col-md-6">    
+        <div class="form-group">            
+            <label>Amount Invested / Projected Net</label>
+            <div class="progress">
+                <div id="gainProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <div class="col-md-4">
-                <small class="form-text text-muted">To Date</small>
-                <input type="date" id="toDate" class="form-control" placeholder="yyyy-mm-dd" onkeyup="filterAndCalculateInvestments()">    
+            <div class="input-group">
+                <input id="amountInvested" class="form-control form-control-lg" type="text" readonly>
+                <div class="input-group-append">
+                    <span id="investmentGainIncrease" class="input-group-text">0.00% Gain</span>
+                </div>
             </div>
-            <div class="col-md-4">
-                <small class="form-text text-muted">Repayment Method</small>
-                <select id="repaymentMethod" class="custom-select" onchange="filterAndCalculateInvestments()">
-                    <option>All</option>
-                    <option>Balloon</option>
-                    <option>Equal</option>
-                </select>
+        </div>                    
+        <div class="form-group">
+            <label>Net Payout</label>
+            <div class="progress">
+                <div id="netPayoutProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-        </div>
-        <p></p>
-        <div class="row">
-            <div class="col-md-12">
-                <form>
-                    <div class="form-group">
-                        <label>Amount Invested / Projected Net</label>
-                        <div class="input-group">
-                            <input id="amountInvested" class="form-control form-control-lg" type="text" readonly>
-                            <div class="input-group-append">
-                                <span id="investmentGainIncrease" class="input-group-text">0.00% Gain</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">                
-                        <label>Net Earnings</label>
-                        <div class="progress">
-                            <div id="netEarningsProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <input id="netEarnings" class="form-control form-control-lg" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Net Payout</label>
-                        <div class="progress">
-                            <div id="netPayoutProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <input id="netPayout" class="form-control form-control-lg" type="text" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Completed Projects</label>
-                        <div class="progress">
-                            <div id="completedProjectsProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <input id="completedProjects" class="form-control form-control-lg" type="text" readonly>
-                    </div>
-                </form>
-            </div>
+            <input id="netPayout" class="form-control form-control-lg" type="text" readonly>
         </div>
     </div>
     <div class="col-md-6">
-        <div id="notifications"></div>
+        <div class="form-group">                
+            <label>Net Earnings</label>
+            <div class="progress">
+                <div id="netEarningsProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <input id="netEarnings" class="form-control form-control-lg" type="text" readonly>
+        </div>
+        <div class="form-group">
+            <label>Completed Projects</label>
+            <div class="progress">
+                <div id="completedProjectsProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <input id="completedProjects" class="form-control form-control-lg" type="text" readonly>
+        </div>
     </div>
 </div>
 <script src="scripts/mydate.js"></script>
@@ -136,6 +139,14 @@
         $("#fromDate").val(dates["earliest"].toString());
         $("#toDate").val(dates["latest"].toString());
 
+        // Load the issuers
+        var issuers = Investment.getIssuers(investments);
+
+        for(var i = 0; i < issuers.length; i++) {
+            var issuer = issuers[i];
+            $("#issuer").append("<option>" + issuer + "</option>");
+        }
+
         filterAndCalculateInvestments();
     });    
 
@@ -153,6 +164,7 @@
         var earliestDate = MyDate.toMyDate($("#fromDate").val());
         var latestDate = MyDate.toMyDate($("#toDate").val());
         var repaymentMethod = $("#repaymentMethod").val();
+        var issuer = $("#issuer").val();
 
         if(earliestDate == null || latestDate == null) {
             resetFields();
@@ -160,7 +172,9 @@
         }
 
         // Get only investments at the given date range
-        var filteredInvestments = Investment.filterInvestmentsByDateAndRepaymentMethod(investments, earliestDate, latestDate, repaymentMethod);
+        var filteredInvestments = Investment.filterInvestmentsByDate(investments, earliestDate, latestDate);
+        filteredInvestments = Investment.filterInvestmentsByRepaymentMethod(filteredInvestments, repaymentMethod);
+        filteredInvestments = Investment.filterInvestmentsByIssuer(filteredInvestments, issuer);
 
         var currentDate = MyDate.now();
         var amountInvested = 0;
@@ -210,14 +224,18 @@
             }
         }
 
+        var gainPercent = (((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2);
+
         $("#amountInvested").val(NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount));        
-        $("#investmentGainIncrease").html("+" + (((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2) + "% Gain");
+        $("#investmentGainIncrease").html("+" + gainPercent + "% Gain");
 
         $("#netEarnings").val(NumberUtils.formatCurrency(completedNetEarnings) + " out of " + NumberUtils.formatCurrency(netEarnings));
         $("#netPayout").val(NumberUtils.formatCurrency(completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(projectedNetAmount));
         $("#completedProjects").val(completedProjects + " out of " + filteredInvestments.length);
 
         // Progress bars
+        $("#gainProgress").css("width", gainPercent);
+
         if(netEarnings > 0)
             $("#netEarningsProgress").css("width", completedNetEarnings / netEarnings * 100);
 

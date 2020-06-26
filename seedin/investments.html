@@ -88,6 +88,12 @@
             <option>Equal</option>
         </select>
     </div>
+    <div class="col-md-2">
+        <small class="form-text text-muted">Issuer</small>
+        <select id="issuer" class="custom-select" onchange="sortAndFilterInvestments()">
+            <option>All</option>
+        </select>
+    </div>
 </div>
 <p></p>
 <div class="row">
@@ -149,6 +155,13 @@
         if("investments.sortOrder" in localStorage)
             $("#sortOrder").val(localStorage.getItem("investments.sortOrder"));
 
+        // Load the issuers
+        var issuers = Investment.getIssuers(investments);
+
+        for(var i = 0; i < issuers.length; i++) {
+            var issuer = issuers[i];
+            $("#issuer").append("<option>" + issuer + "</option>");
+        }
 
         sortAndFilterInvestments();
     });
@@ -160,12 +173,15 @@
         var earliestDate = MyDate.toMyDate($("#fromDate").val());
         var latestDate = MyDate.toMyDate($("#toDate").val());
         var repaymentMethod = $("#repaymentMethod").val();
+        var issuer = $("#issuer").val();
 
         if(earliestDate == null || latestDate == null)
             return;
 
         // Get only investments at the given date range
-        var filteredInvestments = Investment.filterInvestmentsByDateAndRepaymentMethod(investments, earliestDate, latestDate, repaymentMethod);
+        var filteredInvestments = Investment.filterInvestmentsByDate(investments, earliestDate, latestDate);
+        filteredInvestments = Investment.filterInvestmentsByRepaymentMethod(filteredInvestments, repaymentMethod);
+        filteredInvestments = Investment.filterInvestmentsByIssuer(filteredInvestments, issuer);
 
         // Sort it
         var sortedBy = $("#sortedBy").find(":selected").val();
