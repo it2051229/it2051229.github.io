@@ -41,6 +41,12 @@
 </nav>
 
 <main role="main" class="container-fluid">
+<style>
+    .progress {
+        margin-bottom: 3px;
+        height: 5px;
+    }
+</style>
 <div class="row">
     <div class="col-md-12">
         <h2>Dashboard</h2>
@@ -81,14 +87,23 @@
                     </div>
                     <div class="form-group">                
                         <label>Net Earnings</label>
+                        <div class="progress">
+                            <div id="netEarningsProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                         <input id="netEarnings" class="form-control form-control-lg" type="text" readonly>
                     </div>
                     <div class="form-group">
                         <label>Net Payout</label>
+                        <div class="progress">
+                            <div id="netPayoutProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                         <input id="netPayout" class="form-control form-control-lg" type="text" readonly>
                     </div>
                     <div class="form-group">
                         <label>Completed Projects</label>
+                        <div class="progress">
+                            <div id="completedProjectsProgress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                         <input id="completedProjects" class="form-control form-control-lg" type="text" readonly>
                     </div>
                 </form>
@@ -193,17 +208,28 @@
                     }
                 }
             }
-
-
         }
 
-        $("#amountInvested").val(NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount));
-        $("#investmentGainIncrease").html((((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2) + "% Gain");
+        $("#amountInvested").val(NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount));        
+        $("#investmentGainIncrease").html("+" + (((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2) + "% Gain");
+
         $("#netEarnings").val(NumberUtils.formatCurrency(completedNetEarnings) + " out of " + NumberUtils.formatCurrency(netEarnings));
         $("#netPayout").val(NumberUtils.formatCurrency(completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(projectedNetAmount));
         $("#completedProjects").val(completedProjects + " out of " + filteredInvestments.length);
 
+        // Progress bars
+        if(netEarnings > 0)
+            $("#netEarningsProgress").css("width", completedNetEarnings / netEarnings * 100);
+
+        if(projectedNetAmount > 0)
+            $("#netPayoutProgress").css("width", completedNetPayoutAmount / projectedNetAmount * 100);
+
+        if(filteredInvestments.length > 0)
+            $("#completedProjectsProgress").css("width", completedProjects / filteredInvestments.length * 100);
+
         // Notice of payouts
+        $("#notifications").empty();
+
         if(numPayoutsToday > 0) {
             var message = "<strong>Heads up!</strong> You have <strong>2 payout(s)</strong> today with a <strong>Total Net Earnings</strong> amount of ";
             message += "<strong>" + NumberUtils.formatCurrency(totalNetEarningsToday) + "</strong> and <strong>Total Net Payout</strong> amount of ";
@@ -213,9 +239,8 @@
             $("#notifications").append("<div class='alert alert-warning'>" + message + "</div>");
         }
 
-        if(numMaturedToday > 0) {
+        if(numMaturedToday > 0)
             $("#notifications").append("<div class='alert alert-success'><strong>Congratulations!</strong> You have <strong>" + numMaturedToday + " project(s)</strong> that reached the maturity date today.</div>");
-        }
     }
 </script>
     </main>
