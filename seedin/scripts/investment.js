@@ -231,7 +231,11 @@ class Investment {
         );
 
         investment.properties["projectUrl"] = json["projectUrl"];
-        investment.properties["issuer"] = json["issuer"];
+        investment.properties["issuer"] = "";
+
+        if("issuer" in json)
+            investment.properties["issuer"] = json["issuer"];
+
         return investment;
     }
 
