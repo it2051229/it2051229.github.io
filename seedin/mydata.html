@@ -40,7 +40,8 @@
     </div>
 </nav>
 
-<main role="main" class="container-fluid"><div class="row">
+<main role="main" class="container-fluid">
+<div class="row">
     <div class="col-md-6">
         <h2>My Data</h2>
         <p>
@@ -49,10 +50,6 @@
         <p>
             If you wish to work on your data in another computer/phone or web browser, you can export and download it as a file and import it again through this website.
         </p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-6">
         <h2>Export</h2>
         <button class="btn btn-primary" onclick="exportData()">Download My Data</button>
         <p></p>
@@ -60,9 +57,10 @@
         <p>Restore a data from an exported file. This deletes whatever data you currently have.</p>
         <div class="custom-file">
             <input type="file" class="custom-file-input" id="importFile" onchange="importData()">
-            <label class="custom-file-label" for="importFile">Choose file...</label>
-        </div>
-        <p></p>
+            <label class="custom-file-label" for="importFile">Browse or drag file to this box</label>
+        </div>        
+    </div>
+    <div class="col-md-6">
         <h2>Reset</h2>
         <p>Delete all your saved data on this web browser.</p>
         <button class="btn btn-danger" onclick="clearData()">Clear My Data</button>
