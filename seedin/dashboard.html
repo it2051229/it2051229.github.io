@@ -234,16 +234,16 @@
         $("#completedProjects").val(completedProjects + " out of " + filteredInvestments.length);
 
         // Progress bars
-        $("#gainProgress").css("width", gainPercent);
+        $("#gainProgress").css("width", gainPercent + "%");
 
         if(netEarnings > 0)
-            $("#netEarningsProgress").css("width", completedNetEarnings / netEarnings * 100);
+            $("#netEarningsProgress").css("width", (completedNetEarnings / netEarnings * 100) + "%");
 
         if(projectedNetAmount > 0)
-            $("#netPayoutProgress").css("width", completedNetPayoutAmount / projectedNetAmount * 100);
+            $("#netPayoutProgress").css("width", (completedNetPayoutAmount / projectedNetAmount * 100) + "%");
 
         if(filteredInvestments.length > 0)
-            $("#completedProjectsProgress").css("width", completedProjects / filteredInvestments.length * 100);
+            $("#completedProjectsProgress").css("width", (completedProjects / filteredInvestments.length * 100) + "%");
 
         // Notice of payouts
         $("#notifications").empty();
