@@ -184,7 +184,7 @@ table td {
         // Display investment info
         $("#projectId").val(investment.properties["projectId"]);
         $("#investedAmount").val(investment.properties["investmentAmount"]);
-        $("#grossInterestRate").val(investment.properties["grossInterestRate"] * 100);
+        $("#grossInterestRate").val((investment.properties["grossInterestRate"] * 100).toFixed(2));
         $("#projectDate").val(investment.properties["date"].toString());
         $("#repaymentMethod").val(investment.properties["repaymentMethod"]);
         $("#tenure").val(investment.properties["tenure"]);
