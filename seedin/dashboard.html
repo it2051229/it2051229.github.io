@@ -226,6 +226,9 @@
 
         var gainPercent = (((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2);
 
+        if(isNaN(gainPercent))
+            gainPercent = 0;
+
         $("#amountInvested").val(NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount));        
         $("#investmentGainIncrease").html("+" + gainPercent + "% Gain");
 
@@ -234,16 +237,23 @@
         $("#completedProjects").val(completedProjects + " out of " + filteredInvestments.length);
 
         // Progress bars
+        var netEarningsPercent = completedNetEarnings / netEarnings * 100;
+        var netPayoutPercent = completedNetPayoutAmount / projectedNetAmount * 100;
+        var completedProjectsPercent = completedProjects / filteredInvestments.length * 100;
+
+        if(isNaN(netEarningsPercent))
+            netEarningsPercent = 0;
+
+        if(isNaN(netPayoutPercent))
+            netPayoutPercent = 0;
+
+        if(isNaN(completedProjectsPercent))
+            completedProjectsPercent = 0;
+
         $("#gainProgress").css("width", gainPercent + "%");
-
-        if(netEarnings > 0)
-            $("#netEarningsProgress").css("width", (completedNetEarnings / netEarnings * 100) + "%");
-
-        if(projectedNetAmount > 0)
-            $("#netPayoutProgress").css("width", (completedNetPayoutAmount / projectedNetAmount * 100) + "%");
-
-        if(filteredInvestments.length > 0)
-            $("#completedProjectsProgress").css("width", (completedProjects / filteredInvestments.length * 100) + "%");
+        $("#netEarningsProgress").css("width", netEarningsPercent + "%");
+        $("#netPayoutProgress").css("width", netPayoutPercent + "%");
+        $("#completedProjectsProgress").css("width", completedProjectsPercent + "%");
 
         // Notice of payouts
         $("#notifications").empty();
