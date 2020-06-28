@@ -117,6 +117,28 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="negativeGainModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" rol="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Negative Gains</h5>
+            </div>
+            <div class="modal-body">
+                You have a negative gain on the <strong>selected range of date</strong> 
+                because you have <strong>more balloon repayment projects than equal repayment projects</strong>. 
+                Unlike equal repayment projects, your invested funds in a balloon repayment project is 
+                <strong>not divided into months but summed as a whole</strong>. Some of the interests might have 
+                been paid which already lowered your negative gain. As we move closer to the maturity dates, 
+                the negative gain will soon decrease and become positive <strong>once the tenure of the balloon projects has been reached</strong>. 
+                So within the range of dates you have selected, some of your <strong>balloon projects 
+                has not yet reach their tenure</strong> thus resulting in negative gain.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-seconary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="scripts/mydate.js"></script>
 <script src="scripts/investment.js"></script>
 <script src="scripts/database.js"></script>
@@ -201,13 +223,23 @@
 
             if(schedules[schedules.length - 1]["date"].compareTo(currentDate) <= 0)
                 completedProjects++;
-            
+			
+			// If repayment method is balloon, there's no monthly investment.
+			// So we put the whole investment amount.
+			if(investment.properties["repaymentMethod"] == "Balloon")
+				amountInvested += investment.properties["investmentAmount"];
+
+			
             for(var j = 0; j < schedules.length; j++) {
                 var schedule = schedules[j];
 
                 if(schedule["date"].compareTo(earliestDate) >= 0 && schedule["date"].compareTo(latestDate) <= 0) {
                     projectedNetAmount += schedule["netPayout"];
-                    amountInvested += schedule["netPayout"] - schedule["netInterestPayout"];
+					
+					// For equal repayment method, we consider the investment as divided as equal as well.
+					if(investment.properties["repaymentMethod"] == "Equal")
+						amountInvested += schedule["netPayout"] - schedule["netInterestPayout"];
+
                     netEarnings += schedule["netInterestPayout"];
 
                     if(schedule["date"].compareTo(currentDate) <= 0) {
@@ -230,7 +262,7 @@
             gainPercent = 0;
 
         $("#amountInvested").val(NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount));        
-        $("#investmentGainIncrease").html("+" + gainPercent + "% Gain");
+        $("#investmentGainIncrease").html(gainPercent + "% Gain");
 
         $("#netEarnings").val(NumberUtils.formatCurrency(completedNetEarnings) + " out of " + NumberUtils.formatCurrency(netEarnings));
         $("#netPayout").val(NumberUtils.formatCurrency(completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(projectedNetAmount));
@@ -269,8 +301,12 @@
 
         if(numMaturedToday > 0)
             $("#notifications").append("<div class='alert alert-success'><strong>Congratulations!</strong> You have <strong>" + numMaturedToday + " project(s)</strong> that reached the maturity date today.</div>");
+
+        if(gainPercent < 0)
+            $("#notifications").append("<div class='alert alert-info'>You got a <strong><a href='#' data-toggle='modal' data-target='#negativeGainModal'>negative gain</a></strong>.</div>") 
     }
+
 </script>
-    </main>
+</main>
 </body>
 </html>
