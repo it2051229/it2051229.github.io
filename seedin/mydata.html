@@ -45,16 +45,14 @@
     <div class="col-md-6">
         <h2>My Data</h2>
         <p>
-            You own your data and no one else can see it besides you. Your data is permanently stored on this specific web browser only. You can leave and continue working on it anytime.
-        </p>
-        <p>
-            If you wish to work on your data in another computer/phone or web browser, you can export and download it as a file and import it again through this website.
+            Your data is locally saved on this web browser you are currently using. You can continue working on it anytime. 
+            You can export and download your data as a file if you wish to work on your data from another device or web browser.
         </p>
         <h2>Export</h2>
         <button class="btn btn-primary" onclick="exportData()">Download My Data</button>
         <p></p>
         <h2>Import</h2>
-        <p>Restore a data from an exported file. This deletes whatever data you currently have.</p>
+        <p>Restore your data from an exported file. This replaces any data that is currently saved.</p>
         <div class="custom-file">
             <input type="file" class="custom-file-input" id="importFile" onchange="importData()">
             <label class="custom-file-label" for="importFile">Browse or drag file to this box</label>
@@ -62,7 +60,7 @@
     </div>
     <div class="col-md-6">
         <h2>Reset</h2>
-        <p>Delete all your saved data on this web browser.</p>
+        <p>Delete all your saved data from this web browser.</p>
         <button class="btn btn-danger" onclick="clearData()">Clear My Data</button>
     </div>
 </div>
