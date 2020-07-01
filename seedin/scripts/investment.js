@@ -1,7 +1,7 @@
 class Investment {
 
     // Create a new investment object
-    constructor(id, amount, interestRate, date, repaymentMethod, tenure) {
+    constructor(id, amount, interestRate, date, repaymentMethod, tenure, status) {
         this.properties = {
             "projectId": id,
             "investmentAmount": amount,
@@ -10,7 +10,8 @@ class Investment {
             "repaymentMethod": repaymentMethod,
             "tenure": tenure,
             "projectUrl": "",
-            "issuer": ""
+            "issuer": "",
+            "status": status
         };
     }
 
@@ -24,7 +25,8 @@ class Investment {
             "repaymentMethod": this.properties["repaymentMethod"],
             "tenure": this.properties["tenure"],
             "projectUrl": this.properties["projectUrl"],
-            "issuer": this.properties["issuer"]
+            "issuer": this.properties["issuer"],
+            "status": this.properties["status"]
         };
     }
 
@@ -88,6 +90,14 @@ class Investment {
 
     // Calculate the next payout date, how much, and when it will mature
     calculateNextPayAndMaturityDate() {        
+        if(this.properties["status"] == "On Hold") {
+            return {
+                "maturityDate": "On Hold",
+                "nextPayDate": "On Hold",
+                "nextPayAmount": 0
+            }            
+        }
+
         var currentDate = MyDate.now();
         var schedules = this.generateRepaymentSchedule();
 
@@ -221,20 +231,22 @@ class Investment {
 
     // Convert the Json as an investment object
     static jsonToObject(json) {
+        // Migratory code because we just added status
+        if(!("status" in json))
+            json["status"] = "Invested";
+        
         var investment = new Investment(
             json["projectId"],
             json["investmentAmount"],
             json["grossInterestRate"],
             MyDate.jsonToObject(json["date"]),
             json["repaymentMethod"],
-            json["tenure"]
+            json["tenure"],
+            json["status"]
         );
 
         investment.properties["projectUrl"] = json["projectUrl"];
-        investment.properties["issuer"] = "";
-
-        if("issuer" in json)
-            investment.properties["issuer"] = json["issuer"];
+        investment.properties["issuer"] = json["issuer"];
 
         return investment;
     }

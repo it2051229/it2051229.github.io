@@ -50,13 +50,6 @@ table td {
     <div class="row">
         <div class="col-md-6">
             <h2>Add Investment</h2>
-            <div id="warningMessage" class="alert alert-warning" role="alert">
-                <button type="button" class="close" aria-label="Close" onclick="closeWarning()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <strong>Add only the investment if the project has been finalized</strong>. Meaning, there is already a scheduled
-                payment dates. Do not add the investment if it is still under subscription or on hold.
-            </div>
             <div class="form-group">
                 <label for="projectId">Project ID</label>
                 <input type="text" class="form-control" id="projectId" placeholder="Unique ID as given by SeedIn">
@@ -101,6 +94,13 @@ table td {
                 <small id="grossInterestRateHelp" class="form-text text-muted">Subject to 20% tax and 10% risk management fee</small>
             </div>
             <div class="form-group">
+                <label for="status">Status</label>
+                <select class="custom-select" id="status" onchange="toggleFirstDateOfPaymentSchedule()">
+                    <option>Invested</option>
+                    <option>On Hold</option>
+                </select>
+            </div>
+            <div id="firstDateOfPaymentSchedule" class="form-group">
                 <label for="projectDate">First Date of Payment Schedule</label>
                 <input type="date" class="form-control" id="projectDate" placeholder="yyyy-mm-dd">
                 <small id="dateHelp" class="form-text text-muted">Please check your seedin account for the date.</small>
@@ -137,6 +137,7 @@ table td {
                 <input type="text" class="form-control" id="netGainAmount" placeholder="..." readonly>
             </div>
             <p><strong>Repayment Schedule</strong></p>
+            <div id="scheduleNotification"></div>
             <div class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead class="table-dark">
@@ -167,12 +168,6 @@ table td {
 
     // Anything we need to do before the user starts using the page
     $(document).ready(function() {
-        $("#warningMessage").hide();
-
-        // Show the warning if it's the first time the user to use the page
-        if(!("investments.add.warningMessage" in localStorage))
-            $("#warningMessage").show();
-
         // Initialize the issuers to the modal dialog
         var issuers = Investment.getIssuers(database.getInvestments());
 
@@ -210,6 +205,7 @@ table td {
         var date = $.trim($("#projectDate").val());
         var repaymentMethod = $.trim($("#repaymentMethod").find(":selected").val());
         var tenure = $.trim($("#tenure").val());
+        var status = $.trim($("#status").find(":selected").val());
 
         // Validate the project ID
         var validationResult = Investment.validateProjectId(projectId);
@@ -240,12 +236,16 @@ table td {
             return null;
         }
 
-        // Validate the date
-        validationResult = Investment.validateDate(date);
+        // Validate the date only if it is not on hold
+        if(status == "Invested") {
+            validationResult = Investment.validateDate(date);
 
-        if(!validationResult["status"]) {
-            alert(validationResult["message"]);
-            return null;
+            if(!validationResult["status"]) {
+                alert(validationResult["message"]);
+                return null;
+            }
+        } else if(status == "On Hold") {
+            date = MyDate.now().toString();
         }
 
         // Repayment method needs no validation...
@@ -264,7 +264,8 @@ table td {
             parseFloat(grossInterestRate) / 100.0,  
             MyDate.toMyDate(date), 
             repaymentMethod, 
-            parseInt(tenure));
+            parseInt(tenure),
+            status);
 
         investment.properties["projectUrl"] = $("#projectUrl").val();
         investment.properties["issuer"] = $("#issuer").val().toUpperCase();
@@ -308,6 +309,20 @@ table td {
                 + "<td>" + NumberUtils.formatCurrency(schedule["netPayout"]) + "</td>"
                 + "</tr>");
         }
+
+        $("#scheduleNotification").empty();
+        
+        if($("#status").find(":selected").val() == "On Hold")
+            $("#scheduleNotification").html("<div class='alert alert-warning'>This project is <strong>On Hold</strong> and the <strong>repayment dates are just samples</strong>.</div>");
+    }
+
+    // First date of payment schedule is only applicable if the funds are invested. If on hold
+    // it will have no inputs
+    function toggleFirstDateOfPaymentSchedule() {
+        if($("#status").find(":selected").val() == "On Hold")
+            $("#firstDateOfPaymentSchedule").hide();
+        else if($("#status").find(":selected").val() == "Invested")
+            $("#firstDateOfPaymentSchedule").show();
     }
 </script>
 </main>

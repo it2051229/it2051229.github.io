@@ -211,8 +211,17 @@
         var totalPayoutAmountToday = 0;        
         var numMaturedToday = 0;
 
+        var numOnHold = 0;
+        var onHoldAmount = 0;
+
         for(var i = 0; i < filteredInvestments.length; i++) {
             var investment = filteredInvestments[i];
+
+            if(investment.properties["status"] == "On Hold") {
+                numOnHold++;
+                onHoldAmount += investment.properties["investmentAmount"];
+                continue;
+            }
 
             // Break down each investment schedule and include only those schedule that is exactly in the
             // date range, filters out months that
@@ -304,6 +313,9 @@
 
         if(gainPercent < 0)
             $("#notifications").append("<div class='alert alert-info'>You got a <a href='#' data-toggle='modal' data-target='#negativeGainModal'><strong><u>negative gain</u></strong></a>.</div>") 
+
+        if(numOnHold)
+            $("#notifications").append("<div class='alert alert-warning'>You have <strong>" + numOnHold + " on hold project(s)</strong> with a total amount of <strong>" + NumberUtils.formatCurrency(onHoldAmount) + "</strong></div>");
     }
 
 </script>

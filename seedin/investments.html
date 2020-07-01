@@ -206,6 +206,15 @@
                 dateA = investmentA.calculateNextPayDate(); 
                 dateB = investmentB.calculateNextPayDate();
 
+                if(investmentA.properties["status"] == "On Hold" && investmentB.properties["status"] == "On Hold")
+                    return 0;
+                
+                if(investmentA.properties["status"] == "On Hold" && investmentB.properties["status"] == "Invested")
+                    return 1;
+
+                if(investmentA.properties["status"] == "Invested" && investmentB.properties["status"] == "On Hold")
+                    return -1;
+
                 if(dateA == null && dateB == null)
                     return 0;
                 
@@ -218,8 +227,18 @@
                 return dateA.compareTo(dateB);
             }
 
-            if(sortedBy == "Maturity Date")
+            if(sortedBy == "Maturity Date") {
+                if(investmentA.properties["status"] == "On Hold" && investmentB.properties["status"] == "On Hold")
+                    return 0;
+                
+                if(investmentA.properties["status"] == "On Hold" && investmentB.properties["status"] == "Invested")
+                    return 1;
+
+                if(investmentA.properties["status"] == "Invested" && investmentB.properties["status"] == "On Hold")
+                    return -1;
+
                 return investmentA.calculateMaturityDate().compareTo(investmentB.calculateMaturityDate());
+            }
 
             return 0;
         });
