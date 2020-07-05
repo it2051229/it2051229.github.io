@@ -22,6 +22,7 @@ class InvestmentsContainer extends React.Component {
 
 	// Make the active component the add investments
 	handleAddInvestmentClick() {
+		localStorage.setItem("investmentsTable.scrollY", 0);
 		this.setState({ activeComponentName: "AddInvestmentForm", investment: null });
 	}
 

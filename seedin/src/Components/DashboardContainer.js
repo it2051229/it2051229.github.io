@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Form, FormControl, Row, Col, InputGroup, ProgressBar } from "react-bootstrap";
+import { Modal, Alert, Form, FormControl, Row, Col, InputGroup, ProgressBar } from "react-bootstrap";
 import Database from "../Entities/Database";
 import Investment from "../Entities/Investment";
 import MyDate from "../Entities/MyDate";
@@ -22,7 +22,8 @@ class DashboardContainer extends React.Component {
 			"fromDate": dates !== null ? dates["earliest"].toString() : "",
 			"toDate": dates !== null ? dates["latest"].toString() : "",
 			"repaymentMethod": "All",
-			"issuer": "All"
+			"issuer": "All",
+			"showNegativeGainExplanation": false
 		};
 	}
 
@@ -130,7 +131,7 @@ class DashboardContainer extends React.Component {
 		let negativeGainPercentNotification = <></>
 
 		if(gainPercent < 0)
-			negativeGainPercentNotification = <Alert variant="info">You got a <strong><u>negative gain</u></strong>.</Alert>
+			negativeGainPercentNotification = <Alert className="clickable-alert" variant="info" onClick={(e) => { this.setState({"showNegativeGainExplanation": true}) }}>You got a <strong><u>negative gain</u></strong>.</Alert>
 
 		// Set any matured projects notifications
 		let maturedProjectsNotification = <></>
@@ -151,6 +152,23 @@ class DashboardContainer extends React.Component {
 						<h2>Dashboard</h2>
 					</Col>
 				</Row>
+				<Modal show={this.state.showNegativeGainExplanation} onHide={(e) => { this.setState({"showNegativeGainExplanation": false}) }} animation={false}>
+					<Modal.Header closeButton>
+						<Modal.Title>Negative Gain</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<p>
+							You have a negative gain on the <strong>selected range of date</strong>{' '}
+							because you have <strong>more balloon repayment projects than equal repayment projects</strong>.{' '}
+							Unlike equal repayment projects, your invested funds in a balloon repayment project is{' '}
+							<strong>not divided into months but summed as a whole</strong>. Some of the interests might have{' '}
+							been paid which already lowered your negative gain. As we move closer to the maturity dates more interest earned will be released and{' '}
+                			the negative gain will soon decrease and become positive <strong>once the tenure of the balloon projects have been reached</strong>.{' '}
+							So within the range of dates you have selected, some of your <strong>balloon projects{' '}
+							have not yet reached their tenure</strong> which resulted to a negative gain.
+						</p>
+					</Modal.Body>
+				</Modal>
 				<Row>
 					<Col md="12">{ negativeGainPercentNotification }</Col>
 					<Col md="12">{ maturedProjectsNotification }</Col>

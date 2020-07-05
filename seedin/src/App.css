@@ -11,3 +11,7 @@ body {
     margin-bottom: 3px;
     height: 5px;
 }
+
+.clickable-alert {
+    cursor: pointer;
+}
