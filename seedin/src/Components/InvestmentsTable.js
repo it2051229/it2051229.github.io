@@ -44,10 +44,12 @@ class InvestmentsTable extends React.Component {
 
     // Used for restoring scroll
     getSnapshotBeforeUpdate(prevProps, prevState) {
-        if(prevProps.list.length < this.props.list.length) {
-            const list = this.listRef.current;
-            return list.scrollHeight - list.scrollTop;
-        }
+        try {
+            if(prevProps.list.length < this.props.list.length) {
+                const list = this.listRef.current;
+                return list.scrollHeight - list.scrollTop;
+            }
+        } catch(err) {}
 
         return null;
     }
