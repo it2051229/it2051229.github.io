@@ -152,7 +152,7 @@ class DashboardContainer extends React.Component {
 						<h2>Dashboard</h2>
 					</Col>
 				</Row>
-				<Modal show={this.state.showNegativeGainExplanation} onHide={(e) => { this.setState({"showNegativeGainExplanation": false}) }} animation={false}>
+				<Modal show={this.state.showNegativeGainExplanation} onHide={(e) => { this.setState({"showNegativeGainExplanation": false}) }}>
 					<Modal.Header closeButton>
 						<Modal.Title>Negative Gain</Modal.Title>
 					</Modal.Header>

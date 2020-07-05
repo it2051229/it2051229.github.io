@@ -16,12 +16,17 @@ class App extends React.Component {
 		super(props);
 		
 		// The dashboard is the starting container
-		this.state = { activeMenuName: "Dashboard" };
+		this.state = { 
+			"activeMenuName": "Dashboard",
+			"navExpanded": false
+		};
 	}
 
 	// Switch to another container
 	handleMenuClick(newActiveMenuName) {
-		this.setState({ activeMenuName: newActiveMenuName });
+		window.scrollTo(0, 0);
+		localStorage.setItem("investmentsTable.scrollY", 0);
+		this.setState({ "activeMenuName": newActiveMenuName });
 	}
 
 	// Disable the back button of the browser
@@ -38,9 +43,9 @@ class App extends React.Component {
 		// Put the nav links in a list, also show an active state on the selected menu
 		const menuNavLinks = menuNames.map((menuName) => {
 			if(menuName === this.state.activeMenuName)
-				return <Nav.Link key={menuName} active onClick={(e) => this.handleMenuClick(menuName)}>{menuName}</Nav.Link>
+				return <Nav.Link eventKey={menuName} key={menuName} active onClick={(e) => this.handleMenuClick(menuName)}>{menuName}</Nav.Link>
 			
-			return <Nav.Link key={menuName} onClick={(e) => this.handleMenuClick(menuName)}>{menuName}</Nav.Link>
+			return <Nav.Link eventKey={menuName} key={menuName} onClick={(e) => this.handleMenuClick(menuName)}>{menuName}</Nav.Link>
 		});
 
 		// Find the active menu and the appropriate container to display
@@ -48,7 +53,7 @@ class App extends React.Component {
 		
 		return (
 			<>
-				<Navbar bg="dark" variant="dark" expand="md" fixed="top">
+				<Navbar collapseOnSelect bg="dark" variant="dark" expand="md" fixed="top">
 					<Navbar.Brand href="#home"><strong>My SeedIn Portfolio</strong></Navbar.Brand>
 					<Navbar.Toggle aria-controls="basic-navbar-nav" />
 					<Navbar.Collapse id="basic-navbar-nav">

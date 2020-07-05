@@ -51,6 +51,8 @@ class InvestmentForm extends React.Component {
     // Called after the form has been loaded, if the state is in, "update" mode
     // we will calculate the investment details
     componentDidMount() {
+        window.scrollTo(0, 0);
+
         if(this.props.formMode === "update")
             this.handleCalculateClick();
     }
@@ -250,7 +252,7 @@ class InvestmentForm extends React.Component {
                                 </InputGroup.Append>
                             </InputGroup>
                         </Form.Group>
-                        <Modal show={this.state.chooseIssuer} onHide={(e) => { this.setState({"chooseIssuer": false }) }} animation={false}>
+                        <Modal show={this.state.chooseIssuer} onHide={(e) => { this.setState({"chooseIssuer": false }) }}>
                             <Modal.Header closeButton>
                                 <Modal.Title>Choose Issuer</Modal.Title>                                
                             </Modal.Header>

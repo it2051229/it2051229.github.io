@@ -77,6 +77,7 @@ class MyDataContainer extends React.Component {
 					<p>Restore your data from an exported file. This replaces any data that is currently saved.</p>
 					<Form.File label="Browse or drag file to this box" custom
 						onChange={(e) => { this.handleImportClick(e.target.files[0]) }} />
+					<br />
 				</Col>
 				<Col md="6">
 					<h2>Reset</h2>
