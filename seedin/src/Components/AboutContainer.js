@@ -63,7 +63,7 @@ class AboutContainer extends React.Component {
                 </Row>
                 <Row>
                     <Col md="12">
-                        <center><Button variant="primary" size="lg" onClick={(e) => this.buyMeACoffee()}>Support this project! Buy me a coffee!</Button></center>
+                        <center><Button variant="primary" onClick={(e) => this.buyMeACoffee()}>Buy me a coffee!</Button></center>
                     </Col>
                 </Row>
             </>
