@@ -26,8 +26,6 @@ class InvestmentsTable extends React.Component {
                 this.state.toDate = dates["latest"].toString();
             }
         } else {
-            console.log(dates);
-
             this.state = {
                 "fromDate": dates !== null ? dates["earliest"].toString() : "",
                 "toDate": dates !== null ? dates["latest"].toString() : "",
@@ -42,23 +40,10 @@ class InvestmentsTable extends React.Component {
         this.listRef = React.createRef();
     }
 
-    // Used for restoring scroll
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-        try {
-            if(prevProps.list.length < this.props.list.length) {
-                const list = this.listRef.current;
-                return list.scrollHeight - list.scrollTop;
-            }
-        } catch(err) {}
-
-        return null;
-    }
-
-    // Used for restoring scroll
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if(snapshot !== null) {
-            const list = this.listRef.current;
-            list.scrollTop = list.scrollHeight - snapshot;
+    // Restore the scroll
+    componentDidMount() {
+        if("investmentsTable.scrollY" in localStorage) {
+            window.scrollTo(0, localStorage.getItem("investmentsTable.scrollY"));
         }
     }
 
@@ -154,7 +139,11 @@ class InvestmentsTable extends React.Component {
             investmentsTableRows = filteredInvestments.map((investment) => {
                 var payDateDetails = investment.calculateNextPayAndMaturityDate();
 
-                return <tr key={investment.properties["projectId"]} onClick={(e) => { this.props.openInvestmentClick(investment) }}>
+                // When a row is clicked, we save the scroll so we can store later on
+                return <tr key={investment.properties["projectId"]} onClick={(e) => { 
+                            localStorage.setItem("investmentsTable.scrollY", window.scrollY);
+                            this.props.openInvestmentClick(investment) 
+                        }}>
                     <td><strong>{ investment.properties["projectId"] }</strong></td>
                     <td>{ NumberUtils.formatCurrency(investment.properties["investmentAmount"]) }</td>
                     <td>
