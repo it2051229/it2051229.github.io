@@ -243,7 +243,7 @@ class InvestmentForm extends React.Component {
                     <Form>
                         {projectIdInputControl}
                         <Form.Group>
-                            <Form.Label>Borrower Name</Form.Label>
+                            <Form.Label>Borrower Name (optional but recommended)</Form.Label>
                             <InputGroup className="mb-3">
                                 <FormControl placeholder="Issuer" 
                                     value={this.state.loanee} onChange={(e) => { this.setState({"loanee": e.target.value}) }} />
