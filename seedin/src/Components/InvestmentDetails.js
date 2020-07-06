@@ -14,7 +14,7 @@ class InvestmentDetails extends React.Component {
         let onHoldNotice = <></>
 
         // If an investment is provided then display the details
-        if(this.props.investment !== null) {
+        if(this.props.investment !== null) {            
             netInterestRate = (this.props.investment.calculateNetInterestRate() * 100).toFixed(2) + "%";
             netGainRate = (this.props.investment.calculateTenureInterestRate() * 100).toFixed(2) + "%";
             netGainAmount = NumberUtils.formatCurrency(this.props.investment.calculateNetGainAmount());

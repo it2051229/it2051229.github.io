@@ -129,7 +129,6 @@ class Investment {
         var schedules = [];
         var monthlyNetInterestPayoutAmount = this.calculateMonthlyNetInterestPayoutAmount();
         var monthlyCapitalAmount = this.calculateMonthlyCapitalPayoutAmount();
-
         var currentDate = MyDate.copy(this.properties["date"]);
 
         for(var i = 0; i < this.properties["tenure"]; i++) {

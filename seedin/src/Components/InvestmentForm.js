@@ -90,16 +90,19 @@ class InvestmentForm extends React.Component {
             return null;
 		}
 		
-		// Validate the date only if it is not on hold
+        // Validate the date only if it is not on hold
+        var date = this.state.date;
+
         if(this.state.status === "Invested") {
-            validationResult = Investment.validateDate(this.state.date);
+            validationResult = Investment.validateDate(date);
 
             if(!validationResult["status"]) {
                 alert(validationResult["message"]);
                 return null;
             }
         } else if(this.state.status === "On Hold") {
-            this.setState({ "date": MyDate.now().toString() });
+            date = MyDate.now().toString()
+            this.setState({ "date": date });
 		}
 		
 		// Repayment method needs no validation...
@@ -117,7 +120,7 @@ class InvestmentForm extends React.Component {
 			this.state.projectId, 
             parseFloat(this.state.investedAmount), 
             parseFloat(this.state.grossInterestRate) / 100.0,  
-            MyDate.toMyDate(this.state.date), 
+            MyDate.toMyDate(date), 
             this.state.repaymentMethod,
             parseInt(this.state.tenure),
             this.state.status);
