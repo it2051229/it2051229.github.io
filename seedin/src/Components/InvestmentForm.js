@@ -174,6 +174,16 @@ class InvestmentForm extends React.Component {
 
 		this.setState({"investment": investment});
     }
+
+    // Show the modal for issuers
+    handleShowIssuerClick() {
+        if(this.issuers.length <= 0) {
+            alert("There are no available issuers. Manually enter the issuer name and we'll remember it for you.");
+            return;
+        }
+
+        this.setState({"chooseIssuer": true });
+    }
     
 	// Render the investment form depending on the mode assigned
 	render() {
@@ -248,7 +258,7 @@ class InvestmentForm extends React.Component {
                                 <FormControl placeholder="Issuer" 
                                     value={this.state.loanee} onChange={(e) => { this.setState({"loanee": e.target.value}) }} />
                                 <InputGroup.Append>
-                                    <Button variant="outline-dark" onClick={(e) => { this.setState({"chooseIssuer": true }) }}>Choose</Button>
+                                    <Button variant="outline-dark" onClick={(e) => { this.handleShowIssuerClick() }}>Choose</Button>
                                 </InputGroup.Append>
                             </InputGroup>
                         </Form.Group>
@@ -266,7 +276,10 @@ class InvestmentForm extends React.Component {
                             <Form.Label>Project URL (optional)</Form.Label>
                             <InputGroup className="mb-3">
                                 <Form.Control type="text" placeholder="Go to SeedIn, open the project, copy URL and paste it here." 
-                                    value={this.state.projectUrl} onChange={(e) => { this.setState({"projectUrl": e.target.value}) }} />
+                                    value={this.state.projectUrl} onChange={(e) => { 
+                                            
+                                            this.setState({"projectUrl": e.target.value}) 
+                                        }} />
                                 <InputGroup.Append>
                                     <a href={this.state.projectUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark">View</a>
                                 </InputGroup.Append>                                
