@@ -184,6 +184,25 @@ class InvestmentForm extends React.Component {
 
         this.setState({"chooseIssuer": true });
     }
+
+    // Open the link URL web page
+    handleOpenProjectUrlClick() {
+        if(this.state.projectUrl === "")
+            return;
+
+        var url = this.state.projectUrl;
+
+        if(!url.toLowerCase().startsWith("https://") && !url.toLowerCase().startsWith("http://"))
+            url = "http://" + url;
+            
+        var a = document.createElement("a");
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.href = url;
+        a.click();
+
+        this.setState({"projectUrl": url});
+    }
     
 	// Render the investment form depending on the mode assigned
 	render() {
@@ -276,12 +295,9 @@ class InvestmentForm extends React.Component {
                             <Form.Label>Project URL (optional)</Form.Label>
                             <InputGroup className="mb-3">
                                 <Form.Control type="text" placeholder="Go to SeedIn, open the project, copy URL and paste it here." 
-                                    value={this.state.projectUrl} onChange={(e) => { 
-                                            
-                                            this.setState({"projectUrl": e.target.value}) 
-                                        }} />
+                                    value={this.state.projectUrl} onChange={(e) => { this.setState({"projectUrl": e.target.value}) }} />
                                 <InputGroup.Append>
-                                    <a href={this.state.projectUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark">View</a>
+                                    <Button variant="outline-dark" onClick={(e) => { this.handleOpenProjectUrlClick() }}>View</Button>
                                 </InputGroup.Append>                                
                             </InputGroup>
                         </Form.Group>
