@@ -82,6 +82,12 @@ class Database
         // Write to the storage
         localStorage.setItem("investments", JSON.stringify(investmentsJson));
     }
+
+    // Delete everything from the database
+    clear() {
+        this.investments = [];
+        this.persist();
+    }
 }
 
 export default Database;

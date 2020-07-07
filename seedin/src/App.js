@@ -18,7 +18,7 @@ class App extends React.Component {
 		// The dashboard is the starting container
 		this.state = { 
 			"activeMenuName": "Dashboard",
-			"navExpanded": false
+			"version": { "major": 1, "minor": 0, "patch": 0 }
 		};
 	}
 
@@ -38,7 +38,7 @@ class App extends React.Component {
 	render() {
 		// Our containers and its mapping
 		const menuNames = [ "Dashboard", "Investments", "My Data", "About" ];
-		const menuContainers = [ <DashboardContainer />, <InvestmentsContainer />, <MyDataContainer />, <AboutContainer /> ]
+		const menuContainers = [ <DashboardContainer />, <InvestmentsContainer />, <MyDataContainer appVersion={this.state.version} />, <AboutContainer /> ]
 		
 		// Put the nav links in a list, also show an active state on the selected menu
 		const menuNavLinks = menuNames.map((menuName) => {
@@ -54,7 +54,7 @@ class App extends React.Component {
 		return (
 			<>
 				<Navbar collapseOnSelect bg="dark" variant="dark" expand="md" fixed="top">
-					<Navbar.Brand href="#home"><strong>My SeedIn Portfolio</strong></Navbar.Brand>
+				<Navbar.Brand href="#home"><strong>SeedIn Portfolio</strong><sup>{this.state.version.major}.{this.state.version.minor}.{this.state.version.patch}</sup></Navbar.Brand>
 					<Navbar.Toggle aria-controls="basic-navbar-nav" />
 					<Navbar.Collapse id="basic-navbar-nav">
 						<Nav className="mr-auto">

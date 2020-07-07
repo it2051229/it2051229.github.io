@@ -17,13 +17,18 @@ class MyDataContainer extends React.Component {
 	handleExportClick() {
 		var investmentsJson = []
 		var investments = this.database.getInvestments();
+
+		if(investments.length === 0) {
+			alert("You do not have any data to export.");
+			return;
+		}
 		
 		// Serialize everything as a json object
         for(var i = 0; i < investments.length; i++)
 			investmentsJson.push(investments[i].toJson());
 		
 		var downloadLink = document.createElement("a");
-		downloadLink.download = "seedin " + MyDate.now().toString() + ".data";
+		downloadLink.download = "seedin" + this.props.appVersion.major + "." + this.props.appVersion.minor + "." + this.props.appVersion.patch + " " + MyDate.now().toString() + ".data";
 		downloadLink.href="data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(investmentsJson));
 		downloadLink.click();
 	}
@@ -56,6 +61,7 @@ class MyDataContainer extends React.Component {
 		if(!window.confirm("Are you sure you want to clear your data?"))
 			return;
 
+		this.database.clear();
 		localStorage.clear();
 		window.alert("Clear successful.");		
 	}
