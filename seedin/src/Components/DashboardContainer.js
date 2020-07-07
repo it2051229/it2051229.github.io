@@ -50,6 +50,9 @@ class DashboardContainer extends React.Component {
 		var numOnHold = 0;
 		var onHoldAmount = 0;
 
+		var numPayoutsToday = 0;
+		var totalPayoutsToday = 0;
+
 		// Progress bars
         var netEarningsPercent = 0;
         var netPayoutPercent = 0;
@@ -91,6 +94,11 @@ class DashboardContainer extends React.Component {
 					var schedule = schedules[j];
 	
 					if(schedule["date"].compareTo(earliestDate) >= 0 && schedule["date"].compareTo(latestDate) <= 0) {
+						if(schedule["date"].compareTo(currentDate) === 0) {
+							numPayoutsToday++;
+							totalPayoutsToday += schedule["netPayout"];
+						}
+
 						projectedNetAmount += schedule["netPayout"];
 						
 						// For equal repayment method, we consider the investment as divided as equal as well.
@@ -142,8 +150,13 @@ class DashboardContainer extends React.Component {
 		// Set the number of on hold projects notification
 		let onHoldProjectsNotification = <></>
 
-		if(numOnHold)
+		if(numOnHold > 0)
 			onHoldProjectsNotification = <Alert variant="warning">You have <strong>{ numOnHold } on hold project(s)</strong> with a total amount of <strong>{ NumberUtils.formatCurrency(onHoldAmount) }</strong></Alert>
+
+		let payoutsTodayNotification = <></>
+
+		if(numPayoutsToday > 0)
+			payoutsTodayNotification = <Alert variant="success">You have <strong>{ numPayoutsToday } payout(s)</strong> today with a total amount of <strong>{ NumberUtils.formatCurrency(totalPayoutsToday) }</strong></Alert>
 
 		return (
 			<>
@@ -173,6 +186,7 @@ class DashboardContainer extends React.Component {
 					<Col md="12">{ negativeGainPercentNotification }</Col>
 					<Col md="12">{ maturedProjectsNotification }</Col>
 					<Col md="12">{ onHoldProjectsNotification }</Col>
+					<Col md="12">{ payoutsTodayNotification }</Col>
 				</Row>
 				<Row>
 					<Col md="2">
