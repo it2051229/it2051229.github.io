@@ -10,6 +10,7 @@ class InvestmentDetails extends React.Component {
         let netInterestRate = "...";
         let netGainRate = "...";
         let netGainAmount = "...";
+        let netTotalPayoutAmount = "...";
         let paymentSchedules = <tr><td>...</td><td>...</td><td>...</td></tr>
         let onHoldNotice = <></>
 
@@ -17,8 +18,12 @@ class InvestmentDetails extends React.Component {
         if(this.props.investment !== null) {            
             netInterestRate = (this.props.investment.calculateNetInterestRate() * 100).toFixed(2) + "%";
             netGainRate = (this.props.investment.calculateTenureInterestRate() * 100).toFixed(2) + "%";
-            netGainAmount = NumberUtils.formatCurrency(this.props.investment.calculateNetGainAmount());
+            netGainAmount = this.props.investment.calculateNetGainAmount();
+            netTotalPayoutAmount = this.props.investment.properties["investmentAmount"] + netGainAmount;
             paymentSchedules = this.props.investment.generateRepaymentSchedule();
+
+            netGainAmount = NumberUtils.formatCurrency(netGainAmount);
+            netTotalPayoutAmount = NumberUtils.formatCurrency(netTotalPayoutAmount);
 
             paymentSchedules = paymentSchedules.map((schedule) => {
                 return <tr key={schedule["date"].toString()}>
@@ -49,6 +54,10 @@ class InvestmentDetails extends React.Component {
                     <Form.Group>
                         <Form.Label>Net Gain Amount after Tenure</Form.Label>
                         <Form.Control type="text" readOnly value={netGainAmount} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Total Net Payout after Tenure</Form.Label>
+                        <Form.Control type="text" readOnly value={netTotalPayoutAmount} />
                     </Form.Group>
                 </Form>
                 { onHoldNotice }

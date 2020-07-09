@@ -252,7 +252,7 @@ class DashboardContainer extends React.Component {
 						<Form.Group>
 							<Form.Label>Completed Projects</Form.Label>
 							<ProgressBar className="progress" now={ completedProjectsPercent } />
-							<FormControl size="lg" readOnly value={ completedProjects + " out of " + filteredInvestments.length } />
+							<FormControl size="lg" readOnly value={ completedProjects + " out of " + (filteredInvestments.length - numOnHold) } />
 						</Form.Group>
 					</Col>
 				</Row>
