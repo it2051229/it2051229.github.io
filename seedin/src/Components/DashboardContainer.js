@@ -53,6 +53,10 @@ class DashboardContainer extends React.Component {
 		var numPayoutsToday = 0;
 		var totalPayoutsToday = 0;
 
+		var averageGrossInterestRate = 0;
+		var averageNetInterestRate = 0;
+		var averageTenure = 0;
+
 		// Progress bars
         var netEarningsPercent = 0;
         var netPayoutPercent = 0;
@@ -66,6 +70,10 @@ class DashboardContainer extends React.Component {
 			filteredInvestments = Investment.filterInvestmentsByRepaymentMethod(filteredInvestments, this.state.repaymentMethod);
 			filteredInvestments = Investment.filterInvestmentsByIssuer(filteredInvestments, this.state.issuer);
 
+			var totalGrossInterestRate = 0;
+			var totalNetInterestRate = 0;	
+			var totalTenure = 0;
+
 			for(var i = 0; i < filteredInvestments.length; i++) {
 				var investment = filteredInvestments[i];
 	
@@ -74,6 +82,10 @@ class DashboardContainer extends React.Component {
 					onHoldAmount += investment.properties["investmentAmount"];
 					continue;
 				}
+
+				totalGrossInterestRate += investment.properties["grossInterestRate"];
+				totalNetInterestRate += investment.calculateNetInterestRate();
+				totalTenure += investment.properties["tenure"];
 	
 				// Break down each investment schedule and include only those schedule that is exactly in the
 				// date range, filters out months that
@@ -113,26 +125,31 @@ class DashboardContainer extends React.Component {
 						}
 					}
 				}
-
-				// Progress bar calculation
-				netEarningsPercent = completedNetEarnings / netEarnings * 100;
-				netPayoutPercent = completedNetPayoutAmount / projectedNetAmount * 100;
-				completedProjectsPercent = completedProjects / filteredInvestments.length * 100;
-
-				if(isNaN(netEarningsPercent))
-					netEarningsPercent = 0;
-
-				if(isNaN(netPayoutPercent))
-					netPayoutPercent = 0;
-
-				if(isNaN(completedProjectsPercent))
-					completedProjectsPercent = 0;
 			}
-	
+		
+			// Progress bar calculation
+			netEarningsPercent = completedNetEarnings / netEarnings * 100;
+			netPayoutPercent = completedNetPayoutAmount / projectedNetAmount * 100;
+			completedProjectsPercent = completedProjects / filteredInvestments.length * 100;
+
+			if(isNaN(netEarningsPercent))
+				netEarningsPercent = 0;
+
+			if(isNaN(netPayoutPercent))
+				netPayoutPercent = 0;
+
+			if(isNaN(completedProjectsPercent))
+				completedProjectsPercent = 0;
+			
 			gainPercent = (((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2);
 	
 			if(isNaN(gainPercent))
 				gainPercent = 0;
+
+			// Average interest rate calculation
+			averageGrossInterestRate = totalGrossInterestRate / (filteredInvestments.length - numOnHold);
+			averageNetInterestRate = totalNetInterestRate / (filteredInvestments.length - numOnHold);
+			averageTenure = totalTenure / (filteredInvestments.length - numOnHold);
 		}
 
 		// Set negative gain notification
@@ -242,6 +259,11 @@ class DashboardContainer extends React.Component {
 							<ProgressBar className="progress" now={ netPayoutPercent } />
 							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(projectedNetAmount) } />
 						</Form.Group>
+						<Form.Group>
+							<Form.Label>Average Project Gross / Net Interest Rate per annum</Form.Label>
+							<FormControl size="lg" readOnly
+								value={ (averageGrossInterestRate * 100).toFixed(2) + "% / " + (averageNetInterestRate * 100).toFixed(2) + "%" } />
+						</Form.Group>
 					</Col>
 					<Col md="6">
 						<Form.Group>
@@ -253,6 +275,10 @@ class DashboardContainer extends React.Component {
 							<Form.Label>Completed Projects</Form.Label>
 							<ProgressBar className="progress" now={ completedProjectsPercent } />
 							<FormControl size="lg" readOnly value={ completedProjects + " out of " + (filteredInvestments.length - numOnHold) } />
+						</Form.Group>
+						<Form.Group>
+							<Form.Label>Average Project Tenure</Form.Label>
+							<FormControl size="lg" readOnly value={ parseInt(averageTenure) + " month(s)" } />
 						</Form.Group>
 					</Col>
 				</Row>
