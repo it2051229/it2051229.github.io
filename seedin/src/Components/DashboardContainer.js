@@ -65,7 +65,7 @@ class DashboardContainer extends React.Component {
 		var filteredInvestments = [];
 
 		// Proceed only with the calculation on validate dates
-		if(earliestDate != null && latestDate != null) {
+		if(earliestDate != null && latestDate != null && earliestDate.compareTo(latestDate) <= 0) {
 			filteredInvestments = Investment.filterInvestmentsByDate(this.investments, earliestDate, latestDate);
 			filteredInvestments = Investment.filterInvestmentsByRepaymentMethod(filteredInvestments, this.state.repaymentMethod);
 			filteredInvestments = Investment.filterInvestmentsByIssuer(filteredInvestments, this.state.issuer);
@@ -189,7 +189,7 @@ class DashboardContainer extends React.Component {
 					<Modal.Body>
 						<p>
 							You have a negative gain on the <strong>selected range of date</strong>{' '}
-							because you have <strong>more balloon repayment projects than equal repayment projects</strong>.{' '}
+							because you have <strong>more funds on balloon repayment projects than equal repayment projects</strong>.{' '}
 							Unlike equal repayment projects, your invested funds in a balloon repayment project is{' '}
 							<strong>not divided into months but summed as a whole</strong>. Some of the interests might have{' '}
 							been paid which already lowered your negative gain. As we move closer to the maturity dates more interest earned will be released and{' '}
