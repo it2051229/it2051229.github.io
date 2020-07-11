@@ -147,9 +147,13 @@ class DashboardContainer extends React.Component {
 				gainPercent = 0;
 
 			// Average interest rate calculation
-			averageGrossInterestRate = totalGrossInterestRate / (filteredInvestments.length - numOnHold);
-			averageNetInterestRate = totalNetInterestRate / (filteredInvestments.length - numOnHold);
-			averageTenure = totalTenure / (filteredInvestments.length - numOnHold);
+			var numOnGoingProjects = filteredInvestments.length - numOnHold;
+
+			if(numOnGoingProjects > 0) {
+				averageGrossInterestRate = totalGrossInterestRate / numOnGoingProjects;
+				averageNetInterestRate = totalNetInterestRate / numOnGoingProjects;
+				averageTenure = totalTenure / numOnGoingProjects;
+			}
 		}
 
 		// Set negative gain notification
