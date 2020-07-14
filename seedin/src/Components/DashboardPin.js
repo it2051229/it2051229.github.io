@@ -43,13 +43,13 @@ class DashboardPin extends React.Component {
                     <FormControl size="sm" readOnly value={ NumberUtils.formatCurrency(pin.properties["completedNetEarnings"]) + " out of " + NumberUtils.formatCurrency(pin.properties["netEarnings"]) } />
                 </Form.Group>
                 <Form.Group>
-                <Form.Label>Completed Projects</Form.Label>
+                    <Form.Label>Completed Projects</Form.Label>
                     <ProgressBar className="progress" now={ pin.properties["completedProjectsPercent"] } />
                     <FormControl size="sm" readOnly value={ pin.properties["completedProjects"] + " out of " + pin.properties["numOngoingProjects"] } />
                 </Form.Group>
                 <Form.Group>
-                    <ProgressBar className="progress" now={ pin.properties["averageProjectTenurePercent"] } />
                     <Form.Label>Average Project Tenure</Form.Label>
+                    <ProgressBar className="progress" now={ pin.properties["averageProjectTenurePercent"] } />
                     <FormControl size="sm" readOnly value={ parseInt(pin.properties["averageTenure"]) + " month(s)" } />
                 </Form.Group>
             </Card.Body>
