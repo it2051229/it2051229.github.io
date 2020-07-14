@@ -1,9 +1,11 @@
 import React from "react";
-import { Modal, Alert, Form, FormControl, Row, Col, InputGroup, ProgressBar } from "react-bootstrap";
+import { Button, ButtonGroup, Modal, Alert, Form, FormControl, Row, Col, InputGroup, ProgressBar } from "react-bootstrap";
 import Database from "../Entities/Database";
 import Investment from "../Entities/Investment";
 import MyDate from "../Entities/MyDate";
 import NumberUtils from "../Entities/NumberUtils";
+import DashboardPin from "./DashboardPin"
+import Pin from "../Entities/Pin";
 
 // The dashboard contains all summary of projects
 class DashboardContainer extends React.Component {
@@ -12,7 +14,9 @@ class DashboardContainer extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.investments = new Database().getInvestments();
+		this.database = new Database();
+				
+		this.investments = this.database.getInvestments();
 		this.issuers = Investment.getIssuers(this.investments);
 
 		// Initialize the earliest and latest dates
@@ -23,8 +27,55 @@ class DashboardContainer extends React.Component {
 			"toDate": dates !== null ? dates["latest"].toString() : "",
 			"repaymentMethod": "All",
 			"issuer": "All",
-			"showNegativeGainExplanation": false
+			"showNegativeGainExplanation": false,
+			"showPinReportHelp": false,
+			"pins": this.database.getPins()
 		};
+
+		this.handleRemovePinClick = this.handleRemovePinClick.bind(this);
+	}
+
+	// Create a new dashboard pin
+	handleCreatePinClick() {
+		var earliestDate = MyDate.toMyDate(this.state.fromDate);
+		var latestDate = MyDate.toMyDate(this.state.toDate);
+
+		if(earliestDate == null || latestDate == null || earliestDate.compareTo(latestDate) > 0) {
+			window.alert("Pick a sensible date.");
+			return;
+		}
+
+		var pin = new Pin(
+			this.state.fromDate,
+			this.state.toDate,
+			this.state.repaymentMethod,
+			this.state.issuer,
+			this.amountInvested,
+			this.completedNetEarnings,
+			this.netEarnings,
+			this.projectedNetAmount,
+			this.completedNetPayoutAmount,
+			this.completedProjects,
+			this.gainPercent,
+			this.averageGrossInterestRate,
+			this.averageNetInterestRate,
+			this.averageTenure,
+			this.netEarningsPercent,
+			this.netPayoutPercent,
+			this.completedProjectsPercent,
+			this.numOnGoingProjects,
+			this.averageProjectInterestPercent,
+			this.averageProjectTenurePercent
+		);
+		
+		this.database.addPin(pin);
+		this.setState({"pins": this.database.getPins()});
+	}
+
+	// Handle the removal of a pin from the dashboard
+	handleRemovePinClick(pinNumber) {
+		this.database.deletePin(pinNumber - 1);		
+		this.setState({"pins": this.database.getPins()});
 	}
 
 	render() {
@@ -38,13 +89,6 @@ class DashboardContainer extends React.Component {
 
 		// Dashboard numbers
 		var currentDate = MyDate.now();
-		var amountInvested = 0;
-		var completedNetEarnings = 0;
-		var netEarnings = 0;
-		var projectedNetAmount = 0;
-		var completedNetPayoutAmount = 0;
-		var completedProjects = 0;
-		var gainPercent = 0;
 		var numMaturedToday = 0;
 
 		var numOnHold = 0;
@@ -53,15 +97,26 @@ class DashboardContainer extends React.Component {
 		var numPayoutsToday = 0;
 		var totalPayoutsToday = 0;
 
-		var averageGrossInterestRate = 0;
-		var averageNetInterestRate = 0;
-		var averageTenure = 0;
+		this.amountInvested = 0;
+		this.completedNetEarnings = 0;
+		this.netEarnings = 0;
+		this.projectedNetAmount = 0;
+		this.completedNetPayoutAmount = 0;
+		this.completedProjects = 0;
+		this.gainPercent = 0;
+		this.averageGrossInterestRate = 0;
+		this.averageNetInterestRate = 0;
+		this.averageTenure = 0;
+		this.numOnGoingProjects = 0;
+
+		this.averageProjectInterestPercent = 0;
+		this.averageProjectTenurePercent = 0;
 
 		// Progress bars
-        var netEarningsPercent = 0;
-        var netPayoutPercent = 0;
-		var completedProjectsPercent = 0;
-		
+        this.netEarningsPercent = 0;
+        this.netPayoutPercent = 0;
+		this.completedProjectsPercent = 0;
+
 		var filteredInvestments = [];
 
 		// Proceed only with the calculation on validate dates
@@ -95,12 +150,12 @@ class DashboardContainer extends React.Component {
 					numMaturedToday++;
 	
 				if(schedules[schedules.length - 1]["date"].compareTo(currentDate) <= 0)
-					completedProjects++;
+					this.completedProjects++;
 				
 				// If repayment method is balloon, there's no monthly investment.
 				// So we put the whole investment amount.
 				if(investment.properties["repaymentMethod"] === "Balloon")
-					amountInvested += investment.properties["investmentAmount"];
+					this.amountInvested += investment.properties["investmentAmount"];
 				
 				for(var j = 0; j < schedules.length; j++) {
 					var schedule = schedules[j];
@@ -111,55 +166,58 @@ class DashboardContainer extends React.Component {
 							totalPayoutsToday += schedule["netPayout"];
 						}
 
-						projectedNetAmount += schedule["netPayout"];
+						this.projectedNetAmount += schedule["netPayout"];
 						
 						// For equal repayment method, we consider the investment as divided as equal as well.
 						if(investment.properties["repaymentMethod"] === "Equal")
-							amountInvested += schedule["netPayout"] - schedule["netInterestPayout"];
+							this.amountInvested += schedule["netPayout"] - schedule["netInterestPayout"];
 	
-						netEarnings += schedule["netInterestPayout"];
+						this.netEarnings += schedule["netInterestPayout"];
 	
 						if(schedule["date"].compareTo(currentDate) <= 0) {	
-							completedNetEarnings += schedule["netInterestPayout"];
-							completedNetPayoutAmount += schedule["netPayout"];
+							this.completedNetEarnings += schedule["netInterestPayout"];
+							this.completedNetPayoutAmount += schedule["netPayout"];
 						}
 					}
 				}
 			}
 		
 			// Progress bar calculation
-			netEarningsPercent = completedNetEarnings / netEarnings * 100;
-			netPayoutPercent = completedNetPayoutAmount / projectedNetAmount * 100;
-			completedProjectsPercent = completedProjects / filteredInvestments.length * 100;
-
-			if(isNaN(netEarningsPercent))
-				netEarningsPercent = 0;
-
-			if(isNaN(netPayoutPercent))
-				netPayoutPercent = 0;
-
-			if(isNaN(completedProjectsPercent))
-				completedProjectsPercent = 0;
-			
-			gainPercent = (((projectedNetAmount - amountInvested) / amountInvested) * 100).toFixed(2);
+			this.netEarningsPercent = this.completedNetEarnings / this.netEarnings * 100;
+			this.netPayoutPercent = this.completedNetPayoutAmount / this.projectedNetAmount * 100;
+			this.completedProjectsPercent = this.completedProjects / filteredInvestments.length * 100;			
 	
-			if(isNaN(gainPercent))
-				gainPercent = 0;
+			if(isNaN(this.netEarningsPercent))
+				this.netEarningsPercent = 0;
+
+			if(isNaN(this.netPayoutPercent))
+				this.netPayoutPercent = 0;
+
+			if(isNaN(this.completedProjectsPercent))
+				this.completedProjectsPercent = 0;
+			
+			this.gainPercent = (((this.projectedNetAmount - this.amountInvested) / this.amountInvested) * 100).toFixed(2);
+	
+			if(isNaN(this.gainPercent))
+				this.gainPercent = 0;
 
 			// Average interest rate calculation
-			var numOnGoingProjects = filteredInvestments.length - numOnHold;
+			this.numOnGoingProjects = filteredInvestments.length - numOnHold;
 
-			if(numOnGoingProjects > 0) {
-				averageGrossInterestRate = totalGrossInterestRate / numOnGoingProjects;
-				averageNetInterestRate = totalNetInterestRate / numOnGoingProjects;
-				averageTenure = totalTenure / numOnGoingProjects;
+			if(this.numOnGoingProjects > 0) {
+				this.averageGrossInterestRate = totalGrossInterestRate / this.numOnGoingProjects;
+				this.averageNetInterestRate = totalNetInterestRate / this.numOnGoingProjects;
+				this.averageTenure = totalTenure / this.numOnGoingProjects;
+
+				this.averageProjectInterestPercent = this.averageGrossInterestRate / 20 * 100 * 100;
+				this.averageProjectTenurePercent = this.averageTenure  / 12 * 100;	
 			}
 		}
 
 		// Set negative gain notification
 		let negativeGainPercentNotification = <></>
 
-		if(gainPercent < 0)
+		if(this.gainPercent < 0)
 			negativeGainPercentNotification = <Alert className="clickable-alert" variant="info" onClick={(e) => { this.setState({"showNegativeGainExplanation": true}) }}>You got a <strong><u>negative gain</u></strong>.</Alert>
 
 		// Set any matured projects notifications
@@ -179,30 +237,27 @@ class DashboardContainer extends React.Component {
 		if(numPayoutsToday > 0)
 			payoutsTodayNotification = <Alert variant="success">You have <strong>{ numPayoutsToday } payout(s)</strong> today with a total amount of <strong>{ NumberUtils.formatCurrency(totalPayoutsToday) }</strong></Alert>
 
+		// Set the pins
+		let pins = <></>
+		var pinId = 0;
+
+		if(this.state.pins.length > 0) {
+			pins = this.state.pins.map((pin) => {
+				pinId++;
+
+				return <Col md="4" key={"pin-" + pinId}>
+					<DashboardPin pinNumber={pinId} pin={pin} removePinClick={this.handleRemovePinClick} />
+				</Col>
+			});
+		}
+
 		return (
 			<>
 				<Row>
 					<Col md="12">
 						<h2>Dashboard</h2>
 					</Col>
-				</Row>
-				<Modal show={this.state.showNegativeGainExplanation} onHide={(e) => { this.setState({"showNegativeGainExplanation": false}) }}>
-					<Modal.Header closeButton>
-						<Modal.Title>Negative Gain</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						<p>
-							You have a negative gain on the <strong>selected range of date</strong>{' '}
-							because you have <strong>more funds on balloon repayment projects than equal repayment projects</strong>.{' '}
-							Unlike equal repayment projects, your invested funds in a balloon repayment project is{' '}
-							<strong>not divided into months but summed as a whole</strong>. Some of the interests might have{' '}
-							been paid which already lowered your negative gain. As we move closer to the maturity dates more interest earned will be released and{' '}
-                			the negative gain will soon decrease and become positive <strong>once the tenure of the balloon projects have been reached</strong>.{' '}
-							So within the range of dates you have selected, some of your <strong>balloon projects{' '}
-							have not yet reached their tenure</strong> which resulted to a negative gain.
-						</p>
-					</Modal.Body>
-				</Modal>
+				</Row>				
 				<Row>
 					<Col md="12">{ negativeGainPercentNotification }</Col>
 					<Col md="12">{ maturedProjectsNotification }</Col>
@@ -250,42 +305,88 @@ class DashboardContainer extends React.Component {
 					<Col md="6">
 						<Form.Group>
 							<Form.Label>Amount Invested / Projected Net</Form.Label>
-							<ProgressBar className="progress" now={ gainPercent } />
+							<ProgressBar className="progress" now={ this.gainPercent } />
 							<InputGroup className="mb-3">
-								<FormControl size="lg" readOnly value= {NumberUtils.formatCurrency(amountInvested) + " / " + NumberUtils.formatCurrency(projectedNetAmount) } />
+								<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.amountInvested) + " / " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 								<InputGroup.Append>
-									<InputGroup.Text>{ gainPercent }%</InputGroup.Text>
+									<InputGroup.Text>{ this.gainPercent }%</InputGroup.Text>
 								</InputGroup.Append>
 							</InputGroup>
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Net Payout</Form.Label>
-							<ProgressBar className="progress" now={ netPayoutPercent } />
-							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(projectedNetAmount) } />
+							<ProgressBar className="progress" now={ this.netPayoutPercent } />
+							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Average Project Gross / Net Interest Rate per annum</Form.Label>
+							<ProgressBar className="progress" now={ this.averageProjectInterestPercent } />
 							<FormControl size="lg" readOnly
-								value={ (averageGrossInterestRate * 100).toFixed(2) + "% / " + (averageNetInterestRate * 100).toFixed(2) + "%" } />
+								value={ (this.averageGrossInterestRate * 100).toFixed(2) + "% / " + (this.averageNetInterestRate * 100).toFixed(2) + "%" } />
 						</Form.Group>
 					</Col>
 					<Col md="6">
 						<Form.Group>
 							<Form.Label>Net Earnings</Form.Label>
-							<ProgressBar className="progress" now={ netEarningsPercent } />
-							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(completedNetEarnings) + " out of " + NumberUtils.formatCurrency(netEarnings) } />
+							<ProgressBar className="progress" now={ this.netEarningsPercent } />
+							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.completedNetEarnings) + " out of " + NumberUtils.formatCurrency(this.netEarnings) } />
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Completed Projects</Form.Label>
-							<ProgressBar className="progress" now={ completedProjectsPercent } />
-							<FormControl size="lg" readOnly value={ completedProjects + " out of " + (filteredInvestments.length - numOnHold) } />
+							<ProgressBar className="progress" now={ this.completedProjectsPercent } />
+							<FormControl size="lg" readOnly value={ this.completedProjects + " out of " + this.numOnGoingProjects } />
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Average Project Tenure</Form.Label>
-							<FormControl size="lg" readOnly value={ parseInt(averageTenure) + " month(s)" } />
+							<ProgressBar className="progress" now={ this.averageProjectTenurePercent } />
+							<FormControl size="lg" readOnly value={ parseInt(this.averageTenure) + " month(s)" } />
 						</Form.Group>
 					</Col>
 				</Row>
+				<Row>
+					<Col md="12" style={{ textAlign: "center", marginBottom: "1rem" }}>
+						<ButtonGroup className="mb-2">
+							<Button onClick={ ()=> { this.handleCreatePinClick(); } }>Pin Report</Button>
+							<Button variant="dark" onClick={ () => { this.setState({"showPinReportHelp": true}) } }>?</Button>
+						</ButtonGroup>						
+					</Col>
+				</Row>
+				<Row>		
+					{ pins }
+				</Row>
+				<Modal show={this.state.showNegativeGainExplanation} onHide={(e) => { this.setState({"showNegativeGainExplanation": false}) }}>
+					<Modal.Header closeButton>
+						<Modal.Title>Negative Gain</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<p>
+							You have a negative gain on the <strong>selected range of date</strong>{' '}
+							because you have <strong>more funds on balloon repayment projects than equal repayment projects</strong>.{' '}
+							Unlike equal repayment projects, your invested funds in a balloon repayment project is{' '}
+							<strong>not divided into months but summed as a whole</strong>. Some of the interests might have{' '}
+							been paid which already lowered your negative gain. As we move closer to the maturity dates more interest earned will be released and{' '}
+                			the negative gain will soon decrease and become positive <strong>once the tenure of the balloon projects have been reached</strong>.{' '}
+							So within the range of dates you have selected, some of your <strong>balloon projects{' '}
+							have not yet reached their tenure</strong> which resulted to a negative gain.
+						</p>
+					</Modal.Body>
+				</Modal>
+				<Modal show={this.state.showPinReportHelp} onHide={(e) => { this.setState({"showPinReportHelp": false}) }}>
+					<Modal.Header closeButton>
+						<Modal.Title>Pin Report</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<p>
+							This feature allows you to take a snapshot of the calculated values in the dashboard based on the selected filters.
+							This is useful if you want to perform an analysis by comparing the performance of your investments from different dates,
+							repayment methods, and/or issuers.
+						</p>
+						<p>
+							<strong>Note that snapshots does not update. If changes were made on investments, the snapshot will
+							not reflect those changes.</strong>
+						</p>
+					</Modal.Body>
+				</Modal>
 			</>
 		);
 	}

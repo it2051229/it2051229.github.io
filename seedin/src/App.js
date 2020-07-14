@@ -18,7 +18,7 @@ class App extends React.Component {
 		// The dashboard is the starting container
 		this.state = { 
 			"activeMenuName": "Dashboard",
-			"version": { "major": 1, "minor": 0, "patch": 0 }
+			"version": { "major": 1, "minor": 2, "patch": 1 }
 		};
 	}
 

@@ -60,7 +60,7 @@ class AboutContainer extends React.Component {
                             the latest stable version:
                         </p>                    
                         <Alert variant="dark">
-                            <Alert.Link href="https://it2051229.github.io/seedin/download.html" target="_blank" rel="noopener noreferrer">https://it2051229.github.io/seedin/download.html</Alert.Link>
+                            <Alert.Link href="https://it2051229.github.io/seedin/download.html" target="_blank" rel="noopener noreferrer">https://it2051229.github.io/ seedin/download.html</Alert.Link>
                         </Alert>    
                         <p>
                             If you found any issues feel free to shoot 

@@ -14,22 +14,12 @@ class MyDataContainer extends React.Component {
 	}
 
 	// Export data and download it
-	handleExportClick() {
-		var investmentsJson = []
-		var investments = this.database.getInvestments();
+	handleExportClick() {		
+		var version = this.props.appVersion.major + "." + this.props.appVersion.minor + "." + this.props.appVersion.patch;
 
-		if(investments.length === 0) {
-			alert("You do not have any data to export.");
-			return;
-		}
-		
-		// Serialize everything as a json object
-        for(var i = 0; i < investments.length; i++)
-			investmentsJson.push(investments[i].toJson());
-		
 		var downloadLink = document.createElement("a");
-		downloadLink.download = "seedin" + this.props.appVersion.major + "." + this.props.appVersion.minor + "." + this.props.appVersion.patch + " " + MyDate.now().toString() + ".data";
-		downloadLink.href="data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(investmentsJson));
+		downloadLink.download = "seedin" + version + " " + MyDate.now().toString() + ".data";
+		downloadLink.href="data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(this.database.exportAsJson(version)));
 		downloadLink.click();
 	}
 
@@ -40,10 +30,11 @@ class MyDataContainer extends React.Component {
 		
 		var fileReader = new FileReader();
 		var database = this.database;
+		var appVersion = this.props.appVersion.major + "." + this.props.appVersion.minor + "." + this.props.appVersion.patch;
 
 		fileReader.onload = () => {
 			try {
-				if(database.importJson(JSON.parse(fileReader.result)))
+				if(database.importJson(appVersion, JSON.parse(fileReader.result)))
 					window.alert("Import successful.");
 				else
 					window.alert("Import failed.");
