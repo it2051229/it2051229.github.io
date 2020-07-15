@@ -23,7 +23,7 @@ class DashboardPin extends React.Component {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Amount Invested / Projected Net ({ pin.properties["gainPercent"] }%)</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["gainPercent"] } />
+                    <ProgressBar className="progress" now={ pin.properties["gainPercent"] } max="20" />
                     <FormControl size="sm" readOnly value= { NumberUtils.formatCurrency(pin.properties["amountInvested"]) + " / " + NumberUtils.formatCurrency(pin.properties["projectedNetAmount"]) } />
                 </Form.Group>
                 <Form.Group>

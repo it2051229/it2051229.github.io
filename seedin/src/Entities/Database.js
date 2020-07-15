@@ -62,18 +62,18 @@ class Database
     // Convert the JSON to investment objects
     importJson(appVersion, toImportJson) {        
         if(!("version" in toImportJson))
-            // Attempt to migrate
+            // Attempt to migrate from 1.0
             return this.importJsonVersion_1_0_0(toImportJson);
 
         // For those that has a version, we can start impoort as it is
-        if(toImportJson["version"] === "1.2.1")
-            return this.importJsonVersion_1_2_1(toImportJson);
+        if(toImportJson["version"].startsWith("1.2."))
+            return this.importJsonVersion_1_2(toImportJson);
 
         return false;
     }
 
-    // Try to import from version 1.2.1
-    importJsonVersion_1_2_1(toImportJson) {
+    // Try to import from version 1.2
+    importJsonVersion_1_2(toImportJson) {
         if(!("investments" in toImportJson) || !("pins" in toImportJson))
             return false;
 

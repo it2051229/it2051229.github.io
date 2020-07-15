@@ -305,7 +305,7 @@ class DashboardContainer extends React.Component {
 					<Col md="6">
 						<Form.Group>
 							<Form.Label>Amount Invested / Projected Net</Form.Label>
-							<ProgressBar className="progress" now={ this.gainPercent } />
+							<ProgressBar className="progress" now={ this.gainPercent } max="20" />
 							<InputGroup className="mb-3">
 								<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.amountInvested) + " / " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 								<InputGroup.Append>
