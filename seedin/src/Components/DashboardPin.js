@@ -54,8 +54,8 @@ class DashboardPin extends React.Component {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Average Net Interest Rate after Tenure</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["averageNetInterestRateAfterTenure"] } max="20" />
-                    <FormControl size="sm" readOnly value={ pin.properties["averageNetInterestRateAfterTenure"].toFixed(2) + "%" } />
+                    <ProgressBar className="progress" now={ pin.properties["averageGrossInterestRateAfterTenure"] } max="20" />
+                    <FormControl size="sm" readOnly value={ pin.properties["averageGrossInterestRateAfterTenure"].toFixed(2) + "% / " + pin.properties["averageNetInterestRateAfterTenure"].toFixed(2) + "%" } />
                 </Form.Group>
             </Card.Body>
             <Card.Footer style={{ textAlign: "center" }}>

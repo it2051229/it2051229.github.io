@@ -66,6 +66,7 @@ class DashboardContainer extends React.Component {
 			this.numOnGoingProjects,
 			this.averageProjectInterestPercent,
 			this.averageProjectTenurePercent,
+			this.averageGrossInterestRateAfterTenure,
 			this.averageNetInterestRateAfterTenure
 		);
 		
@@ -112,6 +113,7 @@ class DashboardContainer extends React.Component {
 
 		this.averageProjectInterestPercent = 0;
 		this.averageProjectTenurePercent = 0;
+		this.averageGrossInterestRateAfterTenure = 0;
 		this.averageNetInterestRateAfterTenure = 0;
 
 		// Progress bars
@@ -215,6 +217,7 @@ class DashboardContainer extends React.Component {
 				this.averageProjectTenurePercent = this.averageTenure  / 12 * 100;	
 
 				// Calculate the average net interest rate after tenure
+				this.averageGrossInterestRateAfterTenure = ((this.averageGrossInterestRate / 12.0) * this.averageTenure) * 100;
 				this.averageNetInterestRateAfterTenure = ((this.averageNetInterestRate / 12.0) * this.averageTenure) * 100;
 			}
 		}
@@ -351,9 +354,9 @@ class DashboardContainer extends React.Component {
 				<Row>
 					<Col md="6">
 						<Form.Group>
-							<Form.Label>Average Net Interest Rate after Tenure</Form.Label>
-							<ProgressBar className="progress" now={ this.averageNetInterestRateAfterTenure } max="20" />
-							<FormControl size="lg" readOnly value={ this.averageNetInterestRateAfterTenure.toFixed(2) + "%" } />
+							<Form.Label>Average Project Gross / Net Interest Rate after Tenure</Form.Label>
+							<ProgressBar className="progress" now={ this.averageGrossInterestRateAfterTenure } max="20" />
+							<FormControl size="lg" readOnly value={ this.averageGrossInterestRateAfterTenure.toFixed(2) + "% / " + this.averageNetInterestRateAfterTenure.toFixed(2) + "%" } />
 						</Form.Group>
 					</Col>
 				</Row>

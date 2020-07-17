@@ -21,6 +21,7 @@ class Pin {
         numOngoingProjects,
         averageProjectInterestPercent, 
 		averageProjectTenurePercent,
+		averageGrossInterestRateAfterTenure,
 		averageNetInterestRateAfterTenure) {
         
         this.properties = {
@@ -44,6 +45,7 @@ class Pin {
 			"numOngoingProjects": numOngoingProjects,
 			"averageProjectInterestPercent": averageProjectInterestPercent,
 			"averageProjectTenurePercent": averageProjectTenurePercent,
+			"averageGrossInterestRateAfterTenure": averageGrossInterestRateAfterTenure,
 			"averageNetInterestRateAfterTenure": averageNetInterestRateAfterTenure
 		}
 		
@@ -76,6 +78,7 @@ class Pin {
 			"numOngoingProjects": this.properties["numOngoingProjects"],
 			"averageProjectInterestPercent": this.properties["averageProjectInterestPercent"],
 			"averageProjectTenurePercent": this.properties["averageProjectTenurePercent"],
+			"averageGrossInterestRateAfterTenure": this.properties["averageGrossInterestRateAfterTenure"],
 			"averageNetInterestRateAfterTenure": this.properties["averageNetInterestRateAfterTenure"]
         }
     }
@@ -103,6 +106,7 @@ class Pin {
 			json["numOngoingProjects"],
 			json["averageProjectInterestPercent"],
 			json["averageProjectTenurePercent"],
+			json["averageGrossInterestRateAfterTenure"],
 			json["averageNetInterestRateAfterTenure"]
         );
 
