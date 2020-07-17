@@ -29,7 +29,6 @@ class DashboardContainer extends React.Component {
 			"issuer": "All",
 			"showNegativeGainExplanation": false,
 			"showPinReportHelp": false,
-			"showAverageNetInterestRateAfterTenureHelp": false,
 			"pins": this.database.getPins()
 		};
 
@@ -354,12 +353,7 @@ class DashboardContainer extends React.Component {
 						<Form.Group>
 							<Form.Label>Average Net Interest Rate after Tenure</Form.Label>
 							<ProgressBar className="progress" now={ this.averageNetInterestRateAfterTenure } max="20" />
-							<InputGroup className="mb-3">
-								<FormControl size="lg" readOnly value={ this.averageNetInterestRateAfterTenure.toFixed(2) + "%" } />
-								<InputGroup.Append>
-									<Button variant="dark" onClick={ () => { this.setState({"showAverageNetInterestRateAfterTenureHelp": true}) } }><strong>?</strong></Button>
-								</InputGroup.Append>
-							</InputGroup>
+							<FormControl size="lg" readOnly value={ this.averageNetInterestRateAfterTenure.toFixed(2) + "%" } />
 						</Form.Group>
 					</Col>
 				</Row>
@@ -406,30 +400,7 @@ class DashboardContainer extends React.Component {
 							not reflect those changes.</strong>
 						</p>
 					</Modal.Body>
-				</Modal>
-				<Modal show={this.state.showAverageNetInterestRateAfterTenureHelp} onHide={(e) => { this.setState({ "showAverageNetInterestRateAfterTenureHelp": false }) }}>
-					<Modal.Header closeButton>
-						<Modal.Title>Average Interest Rate after Tenure</Modal.Title>						
-					</Modal.Header>
-					<Modal.Body>
-						<p>
-							SeedIn projects are <strong>short term</strong>. It means that that we do not get
-							the full per annum interest rate since project tenure is mostly below 12 months.
-						</p>
-						<p>
-							If your <strong>Projected Net % is close or higher than the Average Interest Rate after Tenure</strong>, it means
-							your allocation of funds are great.
-						</p>
-						<p>
-							If your <strong>Projected Net % is lower than the Average Interest Rate After Tenure</strong>, it means
-							you have more funds allocated to lower interest rate projects than higher interest rate projects.
-						</p>
-						<p>
-							Nevertheless, whether your <strong>Projected Net %</strong> is lower or higher than the <strong>Average Interest Rate after Tenure</strong>, you still
-							end up with profit anyway.
-						</p>
-					</Modal.Body>
-				</Modal>
+				</Modal>				
 			</>
 		);
 	}
