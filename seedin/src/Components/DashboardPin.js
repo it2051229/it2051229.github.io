@@ -52,6 +52,11 @@ class DashboardPin extends React.Component {
                     <ProgressBar className="progress" now={ pin.properties["averageProjectTenurePercent"] } />
                     <FormControl size="sm" readOnly value={ parseInt(pin.properties["averageTenure"]) + " month(s)" } />
                 </Form.Group>
+                <Form.Group>
+                    <Form.Label>Average Net Interest Rate after Tenure</Form.Label>
+                    <ProgressBar className="progress" now={ pin.properties["averageNetInterestRateAfterTenure"] } max="20" />
+                    <FormControl size="sm" readOnly value={ pin.properties["averageNetInterestRateAfterTenure"].toFixed(2) + "%" } />
+                </Form.Group>
             </Card.Body>
             <Card.Footer style={{ textAlign: "center" }}>
                 <Button onClick={() => { this.props.removePinClick(this.props.pinNumber) }}>Remove</Button>

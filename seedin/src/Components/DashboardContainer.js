@@ -29,6 +29,7 @@ class DashboardContainer extends React.Component {
 			"issuer": "All",
 			"showNegativeGainExplanation": false,
 			"showPinReportHelp": false,
+			"showAverageNetInterestRateAfterTenureHelp": false,
 			"pins": this.database.getPins()
 		};
 
@@ -65,7 +66,8 @@ class DashboardContainer extends React.Component {
 			this.completedProjectsPercent,
 			this.numOnGoingProjects,
 			this.averageProjectInterestPercent,
-			this.averageProjectTenurePercent
+			this.averageProjectTenurePercent,
+			this.averageNetInterestRateAfterTenure
 		);
 		
 		this.database.addPin(pin);
@@ -111,6 +113,7 @@ class DashboardContainer extends React.Component {
 
 		this.averageProjectInterestPercent = 0;
 		this.averageProjectTenurePercent = 0;
+		this.averageNetInterestRateAfterTenure = 0;
 
 		// Progress bars
         this.netEarningsPercent = 0;
@@ -181,11 +184,13 @@ class DashboardContainer extends React.Component {
 					}
 				}
 			}
+
+			this.numOnGoingProjects = filteredInvestments.length - numOnHold;
 		
 			// Progress bar calculation
 			this.netEarningsPercent = this.completedNetEarnings / this.netEarnings * 100;
 			this.netPayoutPercent = this.completedNetPayoutAmount / this.projectedNetAmount * 100;
-			this.completedProjectsPercent = this.completedProjects / filteredInvestments.length * 100;			
+			this.completedProjectsPercent = this.completedProjects / this.numOnGoingProjects * 100;
 	
 			if(isNaN(this.netEarningsPercent))
 				this.netEarningsPercent = 0;
@@ -202,8 +207,6 @@ class DashboardContainer extends React.Component {
 				this.gainPercent = 0;
 
 			// Average interest rate calculation
-			this.numOnGoingProjects = filteredInvestments.length - numOnHold;
-
 			if(this.numOnGoingProjects > 0) {
 				this.averageGrossInterestRate = totalGrossInterestRate / this.numOnGoingProjects;
 				this.averageNetInterestRate = totalNetInterestRate / this.numOnGoingProjects;
@@ -211,6 +214,9 @@ class DashboardContainer extends React.Component {
 
 				this.averageProjectInterestPercent = this.averageGrossInterestRate / 20 * 100 * 100;
 				this.averageProjectTenurePercent = this.averageTenure  / 12 * 100;	
+
+				// Calculate the average net interest rate after tenure
+				this.averageNetInterestRateAfterTenure = ((this.averageNetInterestRate / 12.0) * this.averageTenure) * 100;
 			}
 		}
 
@@ -344,6 +350,20 @@ class DashboardContainer extends React.Component {
 					</Col>
 				</Row>
 				<Row>
+					<Col md="6">
+						<Form.Group>
+							<Form.Label>Average Net Interest Rate after Tenure</Form.Label>
+							<ProgressBar className="progress" now={ this.averageNetInterestRateAfterTenure } max="20" />
+							<InputGroup className="mb-3">
+								<FormControl size="lg" readOnly value={ this.averageNetInterestRateAfterTenure.toFixed(2) + "%" } />
+								<InputGroup.Append>
+									<Button variant="dark" Style={{ width: "100px" }} onClick={ () => { this.setState({"showAverageNetInterestRateAfterTenureHelp": true}) } }><strong>?</strong></Button>
+								</InputGroup.Append>
+							</InputGroup>
+						</Form.Group>
+					</Col>
+				</Row>
+				<Row>
 					<Col md="12" style={{ textAlign: "center", marginBottom: "1rem" }}>
 						<ButtonGroup className="mb-2">
 							<Button onClick={ ()=> { this.handleCreatePinClick(); } }>Pin Report</Button>
@@ -384,6 +404,29 @@ class DashboardContainer extends React.Component {
 						<p>
 							<strong>Note that snapshots does not update. If changes were made on investments, the snapshot will
 							not reflect those changes.</strong>
+						</p>
+					</Modal.Body>
+				</Modal>
+				<Modal show={this.state.showAverageNetInterestRateAfterTenureHelp} onHide={(e) => { this.setState({ "showAverageNetInterestRateAfterTenureHelp": false }) }}>
+					<Modal.Header closeButton>
+						<Modal.Title>Average Interest Rate after Tenure</Modal.Title>						
+					</Modal.Header>
+					<Modal.Body>
+						<p>
+							SeedIn projects are <strong>short term</strong>. It means that that we do not get
+							the full per annum interest rate since project tenure is mostly below 12 months.
+						</p>
+						<p>
+							If your <strong>Projected Net % is close or higher than the Average Interest Rate after Tenure</strong>, it means
+							your allocation of funds are great.
+						</p>
+						<p>
+							If your <strong>Projected Net % is lower than the Average Interest Rate After Tenure</strong>, it means
+							you have more funds allocated to lower interest rate projects than higher interest rate projects.
+						</p>
+						<p>
+							Nevertheless, whether your <strong>Projected Net %</strong> is lower or higher than the <strong>Average Interest Rate after Tenure</strong>, you still
+							end up with profit anyway.
 						</p>
 					</Modal.Body>
 				</Modal>

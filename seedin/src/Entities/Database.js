@@ -31,8 +31,13 @@ class Database
         this.pins = [];
 
         for(var j = 0; j < pinsJson.length; j++) {
-            var pin = Pin.jsonToObject(pinsJson[j]);
-            this.pins.push(pin);
+            try {
+                var pin = Pin.jsonToObject(pinsJson[j]);
+                this.pins.push(pin);
+            } catch(err) {
+                // We can fail silently a pin if it cannot be parsed. It's okay because PINs are not critical data
+                console.log(err);                
+            }
         }
     }
 
@@ -65,7 +70,7 @@ class Database
             // Attempt to migrate from 1.0
             return this.importJsonVersion_1_0_0(toImportJson);
 
-        // For those that has a version, we can start impoort as it is
+        // For those that has a version, we can start import as it is
         if(toImportJson["version"].startsWith("1.2."))
             return this.importJsonVersion_1_2(toImportJson);
 
