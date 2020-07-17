@@ -357,7 +357,7 @@ class DashboardContainer extends React.Component {
 							<InputGroup className="mb-3">
 								<FormControl size="lg" readOnly value={ this.averageNetInterestRateAfterTenure.toFixed(2) + "%" } />
 								<InputGroup.Append>
-									<Button variant="dark" Style={{ width: "100px" }} onClick={ () => { this.setState({"showAverageNetInterestRateAfterTenureHelp": true}) } }><strong>?</strong></Button>
+									<Button variant="dark" onClick={ () => { this.setState({"showAverageNetInterestRateAfterTenureHelp": true}) } }><strong>?</strong></Button>
 								</InputGroup.Append>
 							</InputGroup>
 						</Form.Group>

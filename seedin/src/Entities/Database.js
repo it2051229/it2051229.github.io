@@ -108,7 +108,6 @@ class Database
                 tempPins.push(pin);
             } catch(err) {
                 console.log(err);
-                return false;
             }
         }
 

@@ -45,7 +45,12 @@ class Pin {
 			"averageProjectInterestPercent": averageProjectInterestPercent,
 			"averageProjectTenurePercent": averageProjectTenurePercent,
 			"averageNetInterestRateAfterTenure": averageNetInterestRateAfterTenure
-        }
+		}
+		
+		// If any of the properties are undefined then throw an exception
+		for(var key in this.properties)
+			if(this.properties[key] === undefined)
+				throw new Error(key + " is undefined");
     }
 
     // Return the properties as a JSON
