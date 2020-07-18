@@ -36,7 +36,8 @@ class Database
                 this.pins.push(pin);
             } catch(err) {
                 // We can fail silently a pin if it cannot be parsed. It's okay because PINs are not critical data
-                console.log(err);                
+                console.log(err);         
+                this.pins = [];       
             }
         }
     }

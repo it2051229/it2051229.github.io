@@ -12,17 +12,12 @@ class Pin {
         completedNetPayoutAmount,
         completedProjects, 
         gainPercent, 
-        averageGrossInterestRate, 
-        averageNetInterestRate, 
-        averageTenure, 
-        netEarningsPercent,
-        netPayoutPercent, 
-        completedProjectsPercent, 
         numOngoingProjects,
-        averageProjectInterestPercent, 
-		averageProjectTenurePercent,
-		averageGrossInterestRateAfterTenure,
-		averageNetInterestRateAfterTenure) {
+		netInterestRateStats,
+		tenureStats,
+		netInterestRateAfterTenureStats,
+		subscriptionDaysStats,
+		idleDaysStats) {
         
         this.properties = {
             "fromDate": fromDate,
@@ -36,17 +31,12 @@ class Pin {
 			"completedNetPayoutAmount": completedNetPayoutAmount,
 			"completedProjects": completedProjects,
 			"gainPercent": gainPercent,
-			"averageGrossInterestRate": averageGrossInterestRate,
-			"averageNetInterestRate": averageNetInterestRate,
-			"averageTenure": averageTenure,
-			"netEarningsPercent": netEarningsPercent,
-			"netPayoutPercent": netPayoutPercent,
-			"completedProjectsPercent": completedProjectsPercent,
 			"numOngoingProjects": numOngoingProjects,
-			"averageProjectInterestPercent": averageProjectInterestPercent,
-			"averageProjectTenurePercent": averageProjectTenurePercent,
-			"averageGrossInterestRateAfterTenure": averageGrossInterestRateAfterTenure,
-			"averageNetInterestRateAfterTenure": averageNetInterestRateAfterTenure
+			"netInterestRateStats": netInterestRateStats,
+			"tenureStats": tenureStats,
+			"netInterestRateAfterTenureStats": netInterestRateAfterTenureStats,
+			"subscriptionDaysStats": subscriptionDaysStats,
+			"idleDaysStats": idleDaysStats
 		}
 		
 		// If any of the properties are undefined then throw an exception
@@ -69,17 +59,12 @@ class Pin {
 			"completedNetPayoutAmount": this.properties["completedNetPayoutAmount"],
 			"completedProjects": this.properties["completedProjects"],
 			"gainPercent": this.properties["gainPercent"],
-			"averageGrossInterestRate": this.properties["averageGrossInterestRate"],
-			"averageNetInterestRate": this.properties["averageNetInterestRate"],
-			"averageTenure": this.properties["averageTenure"],
-			"netEarningsPercent": this.properties["netEarningsPercent"],
-			"netPayoutPercent": this.properties["netPayoutPercent"],
-			"completedProjectsPercent": this.properties["completedProjectsPercent"],
 			"numOngoingProjects": this.properties["numOngoingProjects"],
-			"averageProjectInterestPercent": this.properties["averageProjectInterestPercent"],
-			"averageProjectTenurePercent": this.properties["averageProjectTenurePercent"],
-			"averageGrossInterestRateAfterTenure": this.properties["averageGrossInterestRateAfterTenure"],
-			"averageNetInterestRateAfterTenure": this.properties["averageNetInterestRateAfterTenure"]
+			"netInterestRateStats": this.properties["netInterestRateStats"],
+			"tenureStats": this.properties["tenureStats"],
+			"netInterestRateAfterTenureStats": this.properties["netInterestRateAfterTenureStats"],
+			"subscriptionDaysStats": this.properties["subscriptionDaysStats"],
+			"idleDaysStats": this.properties["idleDaysStats"]
         }
     }
 
@@ -97,17 +82,12 @@ class Pin {
 			json["completedNetPayoutAmount"],
 			json["completedProjects"],
 			json["gainPercent"],
-			json["averageGrossInterestRate"],
-			json["averageNetInterestRate"],
-			json["averageTenure"],
-			json["netEarningsPercent"],
-			json["netPayoutPercent"],
-			json["completedProjectsPercent"],
 			json["numOngoingProjects"],
-			json["averageProjectInterestPercent"],
-			json["averageProjectTenurePercent"],
-			json["averageGrossInterestRateAfterTenure"],
-			json["averageNetInterestRateAfterTenure"]
+			json["netInterestRateStats"],
+			json["tenureStats"],
+			json["netInterestRateAfterTenureStats"],
+			json["subscriptionDaysStats"],
+			json["idleDaysStats"]
         );
 
         return pin;

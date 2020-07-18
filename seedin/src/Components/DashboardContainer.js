@@ -57,17 +57,12 @@ class DashboardContainer extends React.Component {
 			this.completedNetPayoutAmount,
 			this.completedProjects,
 			this.gainPercent,
-			this.averageGrossInterestRate,
-			this.averageNetInterestRate,
-			this.averageTenure,
-			this.netEarningsPercent,
-			this.netPayoutPercent,
-			this.completedProjectsPercent,
-			this.numOnGoingProjects,
-			this.averageProjectInterestPercent,
-			this.averageProjectTenurePercent,
-			this.averageGrossInterestRateAfterTenure,
-			this.averageNetInterestRateAfterTenure
+			this.numOngoingProjects,
+			this.netInterestRateStats,
+			this.tenureStats,
+			this.netInterestRateAfterTenureStats,
+			this.subscriptionDaysStats,
+			this.idleDaysStats
 		);
 		
 		this.database.addPin(pin);
@@ -98,6 +93,7 @@ class DashboardContainer extends React.Component {
 
 		var numPayoutsToday = 0;
 		var totalPayoutsToday = 0;
+		var totalSubscriptionDays = 0;
 
 		this.amountInvested = 0;
 		this.completedNetEarnings = 0;
@@ -106,20 +102,13 @@ class DashboardContainer extends React.Component {
 		this.completedNetPayoutAmount = 0;
 		this.completedProjects = 0;
 		this.gainPercent = 0;
-		this.averageGrossInterestRate = 0;
-		this.averageNetInterestRate = 0;
-		this.averageTenure = 0;
-		this.numOnGoingProjects = 0;
-
-		this.averageProjectInterestPercent = 0;
-		this.averageProjectTenurePercent = 0;
-		this.averageGrossInterestRateAfterTenure = 0;
-		this.averageNetInterestRateAfterTenure = 0;
-
-		// Progress bars
-        this.netEarningsPercent = 0;
-        this.netPayoutPercent = 0;
-		this.completedProjectsPercent = 0;
+		this.numOngoingProjects = 0;
+		
+		this.netInterestRateStats = { "avg": 0, "low": 0, "high": 0};
+		this.tenureStats = { "avg": 0, "low": 0, "high": 0 };
+		this.netInterestRateAfterTenureStats = { "avg": 0, "low": 0, "high": 0 };
+		this.subscriptionDaysStats = { "avg": 0, "low": 0, "high": 0 };
+		this.idleDaysStats = { "avg": 0, "low": 0, "high": 0 };
 
 		var filteredInvestments = [];
 
@@ -128,8 +117,32 @@ class DashboardContainer extends React.Component {
 			filteredInvestments = Investment.filterInvestmentsByDate(this.investments, earliestDate, latestDate);
 			filteredInvestments = Investment.filterInvestmentsByRepaymentMethod(filteredInvestments, this.state.repaymentMethod);
 			filteredInvestments = Investment.filterInvestmentsByIssuer(filteredInvestments, this.state.issuer);
+			
+			// Sort the investments by project ID, the project ID is the date and that's how we can compute the idle days
+			if(filteredInvestments.length > 0) {
+				filteredInvestments.sort((investmentA, investmentB) => {
+					return investmentA.properties["propertyId"] - investmentB.properties["propertyId"];
+				});
 
-			var totalGrossInterestRate = 0;
+				// Calculate the total idle days
+				var totalIdleDays = 0;
+
+				for(var k = 1; k < filteredInvestments.length; k++) {
+					var idleDays = filteredInvestments[k].getOpenDate().daysBetween(filteredInvestments[k - 1].getOpenDate());
+
+					if(k === 1 || idleDays > this.idleDaysStats["high"])
+						this.idleDaysStats["high"] = idleDays;
+
+					if(k === 1 || idleDays < this.idleDaysStats["low"])
+						this.idleDaysStats["low"] = idleDays;
+
+					totalIdleDays += idleDays;
+				}
+
+				// Calculate the average
+				this.idleDaysStats["avg"] = totalIdleDays / filteredInvestments.length;
+			}
+
 			var totalNetInterestRate = 0;	
 			var totalTenure = 0;
 
@@ -142,9 +155,36 @@ class DashboardContainer extends React.Component {
 					continue;
 				}
 
-				totalGrossInterestRate += investment.properties["grossInterestRate"];
-				totalNetInterestRate += investment.calculateNetInterestRate();
-				totalTenure += investment.properties["tenure"];
+				// Update net interest stats
+				var netInterestRate = investment.calculateNetInterestRate();
+
+				if(i === 0 || netInterestRate > this.netInterestRateStats["high"])
+					this.netInterestRateStats["high"] = netInterestRate;
+				
+				if(i === 0 || netInterestRate < this.netInterestRateStats["low"])
+					this.netInterestRateStats["low"] = netInterestRate;
+
+				// Update tenure stats
+				var tenure = investment.properties["tenure"];
+
+				if(i === 0 || tenure > this.tenureStats["high"])
+					this.tenureStats["high"] = tenure;
+
+				if(i === 0 || tenure < this.tenureStats["low"])
+					this.tenureStats["low"] = tenure;
+
+				// Update subscription days stats
+				var subscriptionDays = investment.calculateSubscriptionDays();
+
+				if(i === 0 || subscriptionDays > this.subscriptionDaysStats["high"])
+					this.subscriptionDaysStats["high"] = subscriptionDays;
+				
+				if(i === 0 || subscriptionDays < this.subscriptionDaysStats["low"])
+					this.subscriptionDaysStats["low"] = subscriptionDays;
+
+				totalNetInterestRate += netInterestRate;
+				totalTenure += tenure;
+				totalSubscriptionDays += subscriptionDays;
 	
 				// Break down each investment schedule and include only those schedule that is exactly in the
 				// date range, filters out months that
@@ -186,39 +226,23 @@ class DashboardContainer extends React.Component {
 				}
 			}
 
-			this.numOnGoingProjects = filteredInvestments.length - numOnHold;
-		
-			// Progress bar calculation
-			this.netEarningsPercent = this.completedNetEarnings / this.netEarnings * 100;
-			this.netPayoutPercent = this.completedNetPayoutAmount / this.projectedNetAmount * 100;
-			this.completedProjectsPercent = this.completedProjects / this.numOnGoingProjects * 100;
-	
-			if(isNaN(this.netEarningsPercent))
-				this.netEarningsPercent = 0;
-
-			if(isNaN(this.netPayoutPercent))
-				this.netPayoutPercent = 0;
-
-			if(isNaN(this.completedProjectsPercent))
-				this.completedProjectsPercent = 0;
-			
+			this.numOngoingProjects = filteredInvestments.length - numOnHold;
 			this.gainPercent = (((this.projectedNetAmount - this.amountInvested) / this.amountInvested) * 100).toFixed(2);
 	
 			if(isNaN(this.gainPercent))
 				this.gainPercent = 0;
 
 			// Average interest rate calculation
-			if(this.numOnGoingProjects > 0) {
-				this.averageGrossInterestRate = totalGrossInterestRate / this.numOnGoingProjects;
-				this.averageNetInterestRate = totalNetInterestRate / this.numOnGoingProjects;
-				this.averageTenure = totalTenure / this.numOnGoingProjects;
+			if(this.numOngoingProjects > 0) {
+				this.netInterestRateStats["avg"] = totalNetInterestRate / this.numOngoingProjects;
+				this.tenureStats["avg"] = totalTenure / this.numOngoingProjects;
 
-				this.averageProjectInterestPercent = this.averageGrossInterestRate / 20 * 100 * 100;
-				this.averageProjectTenurePercent = this.averageTenure  / 12 * 100;	
+				this.netInterestRateAfterTenureStats["avg"] = ((this.netInterestRateStats["avg"] / 12.0) * this.tenureStats["avg"]);
+				this.netInterestRateAfterTenureStats["high"] = ((this.netInterestRateStats["high"] / 12.0) * this.tenureStats["high"]);
+				this.netInterestRateAfterTenureStats["low"] = ((this.netInterestRateStats["low"] / 12.0) * this.tenureStats["low"]);
 
-				// Calculate the average net interest rate after tenure
-				this.averageGrossInterestRateAfterTenure = ((this.averageGrossInterestRate / 12.0) * this.averageTenure) * 100;
-				this.averageNetInterestRateAfterTenure = ((this.averageNetInterestRate / 12.0) * this.averageTenure) * 100;
+				this.subscriptionDaysStats["avg"] = 
+				this.averageNetInterestRateAfterTenure = totalSubscriptionDays / this.numOngoingProjects;
 			}
 		}
 
@@ -318,45 +342,65 @@ class DashboardContainer extends React.Component {
 								<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.amountInvested) + " / " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 								<InputGroup.Append>
 									<InputGroup.Text>{ this.gainPercent }%</InputGroup.Text>
-								</InputGroup.Append>
+								</InputGroup.Append>								
 							</InputGroup>
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Net Payout</Form.Label>
-							<ProgressBar className="progress" now={ this.netPayoutPercent } />
+							<ProgressBar className="progress" now={ this.completedNetPayoutAmount } max={ this.projectedNetAmount } />
 							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
-						</Form.Group>
-						<Form.Group>
-							<Form.Label>Average Project Gross / Net Interest Rate per annum</Form.Label>
-							<ProgressBar className="progress" now={ this.averageProjectInterestPercent } />
-							<FormControl size="lg" readOnly
-								value={ (this.averageGrossInterestRate * 100).toFixed(2) + "% / " + (this.averageNetInterestRate * 100).toFixed(2) + "%" } />
-						</Form.Group>
-					</Col>
-					<Col md="6">
+						</Form.Group>				
 						<Form.Group>
 							<Form.Label>Net Earnings</Form.Label>
-							<ProgressBar className="progress" now={ this.netEarningsPercent } />
+							<ProgressBar className="progress" now={ this.completedNetEarnings } max={ this.netEarnings } />
 							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.completedNetEarnings) + " out of " + NumberUtils.formatCurrency(this.netEarnings) } />
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Completed Projects</Form.Label>
-							<ProgressBar className="progress" now={ this.completedProjectsPercent } />
-							<FormControl size="lg" readOnly value={ this.completedProjects + " out of " + this.numOnGoingProjects } />
-						</Form.Group>
-						<Form.Group>
-							<Form.Label>Average Project Tenure</Form.Label>
-							<ProgressBar className="progress" now={ this.averageProjectTenurePercent } />
-							<FormControl size="lg" readOnly value={ parseInt(this.averageTenure) + " month(s)" } />
-						</Form.Group>
+							<ProgressBar className="progress" now={ this.completedProjects } max={ this.numOngoingProjects } />
+							<FormControl size="lg" readOnly value={ this.completedProjects + " out of " + this.numOngoingProjects } />
+						</Form.Group>		
 					</Col>
-				</Row>
-				<Row>
 					<Col md="6">
 						<Form.Group>
-							<Form.Label>Average Project Gross / Net Interest Rate after Tenure</Form.Label>
-							<ProgressBar className="progress" now={ this.averageGrossInterestRateAfterTenure } max="20" />
-							<FormControl size="lg" readOnly value={ this.averageGrossInterestRateAfterTenure.toFixed(2) + "% / " + this.averageNetInterestRateAfterTenure.toFixed(2) + "%" } />
+							<Form.Label>Interest Rate per annum</Form.Label>
+							<ProgressBar className="progress" now={ (this.netInterestRateStats["avg"] * 100) } max="20" />
+							<FormControl size="lg" readOnly
+								value={ "Avg: " + (this.netInterestRateStats["avg"] * 100).toFixed(2) + "%, "
+											+ "High: " + (this.netInterestRateStats["high"] * 100).toFixed(2) + "%, "
+											+ "Low: " + (this.netInterestRateStats["low"] * 100).toFixed(2) + "%" } />
+						</Form.Group>
+						<Form.Group>
+							<Form.Label>Net Interest Rate after Tenure</Form.Label>
+							<ProgressBar className="progress" now={ this.netInterestRateAfterTenureStats["avg"] * 100 } max="20" />
+							<FormControl size="lg" readOnly 
+								value={ "Avg: " + (this.netInterestRateAfterTenureStats["avg"] * 100).toFixed(2) + "%, "
+											+ "High: " + (this.netInterestRateAfterTenureStats["high"] * 100).toFixed(2) + "%, "
+											+ "Low: " + (this.netInterestRateAfterTenureStats["low"] * 100).toFixed(2) + "%" } />
+						</Form.Group>
+						<Form.Group>
+							<Form.Label>Project Tenure</Form.Label>
+							<ProgressBar className="progress" now={ this.tenureStats["avg"] } max="12" />
+							<FormControl size="lg" readOnly 
+								value={ "Avg: " + parseInt(this.tenureStats["avg"]) + " month(s), " 
+											+ "High: " + this.tenureStats["high"] + " month(s), " 
+											+ "Low: " + this.tenureStats["low"] + " month(s)" } />
+						</Form.Group>
+						<Form.Group>
+							<Form.Label>Subscription Days</Form.Label>
+							<ProgressBar className="progress" now={ this.subscriptionDaysStats["avg"] } max="30" />
+							<FormControl size="lg" readOnly 
+								value={ "Avg: " + parseInt(this.subscriptionDaysStats["avg"]) + " day(s), " 
+											+ "High: " + this.subscriptionDaysStats["high"] + " day(s), "
+											+ "Low: " + this.subscriptionDaysStats["low"] + " day(s)"} />
+						</Form.Group>
+						<Form.Group>
+							<Form.Label>Days before participating on another Project</Form.Label>
+							<ProgressBar className="progress" now={ this.idleDaysStats["avg"] } max="30" />
+							<FormControl size="lg" readOnly 
+								value={ "Avg: " + parseInt(this.idleDaysStats["avg"]) + " day(s), " 
+											+ "High: " + this.idleDaysStats["high"] + " day(s), "
+											+ "Low: " + this.idleDaysStats["low"] + " day(s)"} />
 						</Form.Group>
 					</Col>
 				</Row>

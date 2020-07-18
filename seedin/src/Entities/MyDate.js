@@ -49,7 +49,67 @@ class MyDate {
             + day;
     }
 
-    // Add a month
+    // Calculate how many days between this date and the other date
+    daysBetween(otherDate) {
+        if(this.compareTo(otherDate) > 0)
+            return otherDate.daysBetween(this);
+
+        var daysEachMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        var currentDay = this.properties["day"];
+        var currentMonth = this.properties["month"];
+        var currentYear = this.properties["year"];
+        var daysPassed = 0;
+
+        // Update month for february if leap year
+        if(MyDate.isLeapYear(currentYear))
+            daysEachMonth[1] = 29;
+
+        while(currentYear !== otherDate.properties["year"]
+                || currentMonth !== otherDate.properties["month"]
+                || currentDay !== otherDate.properties["day"]) {
+            currentDay++;
+            daysPassed++;
+
+            if(currentDay > daysEachMonth[currentMonth - 1]) {
+                // Move to the next month
+                currentDay = 1;
+                currentMonth++;
+
+                if(currentMonth > 12) {
+                    // Move to the next year
+                    currentMonth = 1;
+                    currentYear++;
+
+                    // Check if leap year, update the month for february
+                    if(MyDate.isLeapYear(currentYear))
+                        daysEachMonth[1] = 29;
+                    else
+                        daysEachMonth[1] = 28;
+                }
+            }
+        }
+
+        return daysPassed;
+    }
+
+    // Get the date before a month
+    subtractMonth() {
+        var year = this.properties["year"];
+        var month = this.properties["month"] - 1;
+        var day = this.properties["day"];
+
+        if(month < 1) {
+            month = 12;
+            year--;
+        }
+
+        return new MyDate(year, month, day);
+    }
+
+    // Add a month, this is special. Each month consists of different
+    // days but SeedIn never releases payments that ends in days where
+    // it is 31 and it is 29
     addMonth() {
         // Set the days for each month    
         var year = this.properties["year"];
@@ -132,6 +192,11 @@ class MyDate {
             json["month"],
             json["day"]
         );
+    }
+
+    // Utility function to check if leap year
+    static isLeapYear(year) {
+        return year % 100 === 0 ? year % 400 === 0 : year % 4 === 0;
     }
 }
 

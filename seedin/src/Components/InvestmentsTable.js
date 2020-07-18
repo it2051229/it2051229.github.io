@@ -82,7 +82,7 @@ class InvestmentsTable extends React.Component {
             
             filteredInvestments.sort((investmentA, investmentB) => {
                 if(sortedBy === "Project ID")
-                return investmentA.properties["propertyId"] - investmentB.properties["propertyId"];
+                    return investmentA.properties["propertyId"] - investmentB.properties["propertyId"];
                 
                 if(sortedBy === "Investment Amount")
                     return investmentA.properties["investmentAmount"] - investmentB.properties["investmentAmount"];

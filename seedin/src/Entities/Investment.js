@@ -32,6 +32,33 @@ class Investment {
         };
     }
 
+    // Extract the date the investment was opened
+    getOpenDate() {
+        var projectId = this.properties["projectId"];
+
+        var year = parseInt(projectId[0] + "" + projectId[1] + "" + projectId[2] + "" + projectId[3]);
+        var month = parseInt(projectId[4] + "" + projectId[5]);
+        var day = parseInt(projectId[6] + "" + projectId[7]);
+
+        return new MyDate(year, month, day);
+    }
+
+    // Calculate how many days it took for to subscribe before the issuer get the loan
+    // Not applicable if the investment's current status is OnHold
+    calculateSubscriptionDays() {
+        if(this.properties["status"] === "On Hold")
+            throw new Error("Project " + this.properties["projectId"] + " is On Hold");
+        
+        // Project has a maximum subscription days of 30... so the first month of payment is
+        // the basis. We go back a month.
+        var endDate = this.properties["date"].subtractMonth();
+
+        // The project ID is the indicator on when the project opened, in the format of YYYYMMDDhhmm
+        // Remove the year, remove the month
+        var openDate = this.getOpenDate();
+        return openDate.daysBetween(endDate);
+    }
+
     // Calculate the net interest rate per annum
     calculateNetInterestRate() {
         var feeRate = 0.30;
@@ -282,7 +309,7 @@ class Investment {
     static filterInvestmentsByDate(investments, startDate, endDate) {        
         return investments.filter(function(investment) {
             return investment.calculateMaturityDate().compareTo(startDate) >= 0
-                && investment.properties["date"].compareTo(endDate) <= 0;               
+                && investment.getOpenDate().compareTo(endDate) <= 0;               
         });
     }
 

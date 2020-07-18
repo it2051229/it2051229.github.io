@@ -7,55 +7,79 @@ class DashboardPin extends React.Component {
 
     // The values for the dashboard pin will be taken from the props
     render() {
-        var pin = this.props.pin;
-                        
+        var properties = this.props.pin["properties"];
+        
         return (
             <Card bg="dark" text="white" style={{ marginBottom: "2rem" }}>
-            <Card.Header><strong>{pin.properties["fromDate"]} to {pin.properties["toDate"]}</strong></Card.Header>
+            <Card.Header><strong>{properties["fromDate"]} to {properties["toDate"]}</strong></Card.Header>
             <Card.Body>
                 <Form.Group>
                     <Form.Label>Repayment Method</Form.Label>
-                    <FormControl size="sm" readOnly value={pin.properties["repaymentMethod"]} />
+                    <FormControl size="sm" readOnly value={properties["repaymentMethod"]} />
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Issuer</Form.Label>
-                    <FormControl size="sm" readOnly value={pin.properties["issuer"]} />
+                    <FormControl size="sm" readOnly value={properties["issuer"]} />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Amount Invested / Projected Net ({ pin.properties["gainPercent"] }%)</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["gainPercent"] } max="20" />
-                    <FormControl size="sm" readOnly value= { NumberUtils.formatCurrency(pin.properties["amountInvested"]) + " / " + NumberUtils.formatCurrency(pin.properties["projectedNetAmount"]) } />
+                    <Form.Label>Amount Invested / Projected Net ({ properties["gainPercent"] }%)</Form.Label>
+                    <ProgressBar className="progress" now={ properties["gainPercent"] } max="20" />
+                    <FormControl size="sm" readOnly value= { NumberUtils.formatCurrency(properties["amountInvested"]) + " / " + NumberUtils.formatCurrency(properties["projectedNetAmount"]) } />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Net Payout</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["netPayoutPercent"] } />
-                    <FormControl size="sm" readOnly value={ NumberUtils.formatCurrency(pin.properties["completedNetPayoutAmount"]) + " out of " + NumberUtils.formatCurrency(pin.properties["projectedNetAmount"]) } />
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Average Project Gross / Net Interest Rate per annum</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["averageProjectInterestPercent"] } />
-                    <FormControl size="sm" readOnly
-                        value={ (pin.properties["averageGrossInterestRate"] * 100).toFixed(2) + "% / " + (pin.properties["averageNetInterestRate"] * 100).toFixed(2) + "%" } />
-                </Form.Group>
+                <Form.Label>Net Payout</Form.Label>
+                    <ProgressBar className="progress" now={ properties["completedNetPayoutAmount"] } max={ properties["projectedNetAmount"] } />
+                    <FormControl size="sm" readOnly value={ NumberUtils.formatCurrency(properties["completedNetPayoutAmount"]) + " out of " + NumberUtils.formatCurrency(properties["projectedNetAmount"]) } />
+                </Form.Group>              
                 <Form.Group>
                     <Form.Label>Net Earnings</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["netEarningsPercent"] } />
-                    <FormControl size="sm" readOnly value={ NumberUtils.formatCurrency(pin.properties["completedNetEarnings"]) + " out of " + NumberUtils.formatCurrency(pin.properties["netEarnings"]) } />
+                    <ProgressBar className="progress" now={ properties["completedNetEarnings"] } max={ properties["netEarnings"] } />
+                    <FormControl size="sm" readOnly value={ NumberUtils.formatCurrency(properties["completedNetEarnings"]) + " out of " + NumberUtils.formatCurrency(properties["netEarnings"]) } />
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Completed Projects</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["completedProjectsPercent"] } />
-                    <FormControl size="sm" readOnly value={ pin.properties["completedProjects"] + " out of " + pin.properties["numOngoingProjects"] } />
+                    <ProgressBar className="progress" now={ properties["completedProjects"] } max={ properties["numOngoingProjects"] } />
+                    <FormControl size="sm" readOnly value={ properties["completedProjects"] + " out of " + properties["numOngoingProjects"] } />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Average Project Tenure</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["averageProjectTenurePercent"] } />
-                    <FormControl size="sm" readOnly value={ parseInt(pin.properties["averageTenure"]) + " month(s)" } />
+                    <Form.Label>Interest Rate per annum</Form.Label>
+                    <ProgressBar className="progress" now={ (properties["netInterestRateStats"]["avg"] * 100) } max="20" />
+                    <FormControl size="sm" readOnly
+                        value={ "Avg: " + (properties["netInterestRateStats"]["avg"] * 100).toFixed(2) + "%, "
+                                    + "High: " + (properties["netInterestRateStats"]["high"] * 100).toFixed(2) + "%, "
+                                    + "Low: " + (properties["netInterestRateStats"]["low"] * 100).toFixed(2) + "%" } />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Average Net Interest Rate after Tenure</Form.Label>
-                    <ProgressBar className="progress" now={ pin.properties["averageGrossInterestRateAfterTenure"] } max="20" />
-                    <FormControl size="sm" readOnly value={ pin.properties["averageGrossInterestRateAfterTenure"].toFixed(2) + "% / " + pin.properties["averageNetInterestRateAfterTenure"].toFixed(2) + "%" } />
+                    <Form.Label>Net Interest Rate after Tenure</Form.Label>
+                    <ProgressBar className="progress" now={ properties["netInterestRateAfterTenureStats"]["avg"] * 100 } max="20" />
+                    <FormControl size="sm" readOnly 
+                        value={ "Avg: " + (properties["netInterestRateAfterTenureStats"]["avg"] * 100).toFixed(2) + "%, "
+                                    + "High: " + (properties["netInterestRateAfterTenureStats"]["high"] * 100).toFixed(2) + "%, "
+                                    + "Low: " + (properties["netInterestRateAfterTenureStats"]["low"] * 100).toFixed(2) + "%" } />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Project Tenure</Form.Label>
+                    <ProgressBar className="progress" now={ properties["tenureStats"]["avg"] } max="12" />
+                    <FormControl size="sm" readOnly 
+                        value={ "Avg: " + parseInt(properties["tenureStats"]["avg"]) + " month(s), " 
+                                    + "High: " + properties["tenureStats"]["high"] + " month(s), " 
+                                    + "Low: " + properties["tenureStats"]["low"] + " month(s)" } />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Subscription Days</Form.Label>
+                    <ProgressBar className="progress" now={ properties["subscriptionDaysStats"]["avg"] } max="30" />
+                    <FormControl size="sm" readOnly 
+                        value={ "Avg: " + parseInt(properties["subscriptionDaysStats"]["avg"]) + " day(s), " 
+                                    + "High: " + properties["subscriptionDaysStats"]["high"] + " day(s), "
+                                    + "Low: " + properties["subscriptionDaysStats"]["low"] + " day(s)"} />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Days before participating on another Project</Form.Label>
+                    <ProgressBar className="progress" now={ properties["idleDaysStats"]["avg"] } max="30" />
+                    <FormControl size="sm" readOnly 
+                        value={ "Avg: " + parseInt(properties["idleDaysStats"]["avg"]) + " day(s), " 
+                                    + "High: " + properties["idleDaysStats"]["high"] + " day(s), "
+                                    + "Low: " + properties["idleDaysStats"]["low"] + " day(s)"} />
                 </Form.Group>
             </Card.Body>
             <Card.Footer style={{ textAlign: "center" }}>
