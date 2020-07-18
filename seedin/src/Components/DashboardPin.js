@@ -22,9 +22,14 @@ class DashboardPin extends React.Component {
                     <FormControl size="sm" readOnly value={properties["issuer"]} />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Amount Invested / Projected Net ({ properties["gainPercent"] }%)</Form.Label>
+                    <Form.Label>Amount Invested / Projected Net</Form.Label>
                     <ProgressBar className="progress" now={ properties["gainPercent"] } max="20" />
-                    <FormControl size="sm" readOnly value= { NumberUtils.formatCurrency(properties["amountInvested"]) + " / " + NumberUtils.formatCurrency(properties["projectedNetAmount"]) } />
+                    <InputGroup size="sm" className="mb-3">
+                        <FormControl readOnly value= { NumberUtils.formatCurrency(properties["amountInvested"]) + " / " + NumberUtils.formatCurrency(properties["projectedNetAmount"]) } />
+                        <InputGroup.Append>
+                            <InputGroup.Text>{ properties["gainPercent"] }%</InputGroup.Text>
+                        </InputGroup.Append>
+                    </InputGroup>
                 </Form.Group>
                 <Form.Group>
                 <Form.Label>Net Payout</Form.Label>
