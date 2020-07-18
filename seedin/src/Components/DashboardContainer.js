@@ -363,7 +363,7 @@ class DashboardContainer extends React.Component {
 					</Col>
 					<Col md="6">
 						<Form.Group>
-							<Form.Label>Interest Rate per annum</Form.Label>
+							<Form.Label>Net Interest Rate per annum</Form.Label>
 							<ProgressBar className="progress" now={ (this.netInterestRateStats["avg"] * 100) } max="20" />
 							<FormControl size="lg" readOnly
 								value={ "Avg: " + (this.netInterestRateStats["avg"] * 100).toFixed(2) + "%, "

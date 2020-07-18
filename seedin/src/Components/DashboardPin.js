@@ -42,7 +42,7 @@ class DashboardPin extends React.Component {
                     <FormControl size="sm" readOnly value={ properties["completedProjects"] + " out of " + properties["numOngoingProjects"] } />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Interest Rate per annum</Form.Label>
+                    <Form.Label>Net Interest Rate per annum</Form.Label>
                     <ProgressBar className="progress" now={ (properties["netInterestRateStats"]["avg"] * 100) } max="20" />
                     <FormControl size="sm" readOnly
                         value={ "Avg: " + (properties["netInterestRateStats"]["avg"] * 100).toFixed(2) + "%, "
