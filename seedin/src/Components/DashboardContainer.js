@@ -334,12 +334,12 @@ class DashboardContainer extends React.Component {
 					</Col>
 				</Row>
 				<Row>
-					<Col md="6">
+					<Col md="4">
 						<Form.Group>
 							<Form.Label>Amount Invested / Projected Net</Form.Label>
 							<ProgressBar className="progress" now={ this.gainPercent } max="20" />
 							<InputGroup className="mb-3">
-								<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.amountInvested) + " / " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
+								<FormControl readOnly value={ NumberUtils.formatCurrency(this.amountInvested) + " / " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 								<InputGroup.Append>
 									<InputGroup.Text>{ this.gainPercent }%</InputGroup.Text>
 								</InputGroup.Append>								
@@ -348,65 +348,117 @@ class DashboardContainer extends React.Component {
 						<Form.Group>
 							<Form.Label>Net Payout</Form.Label>
 							<ProgressBar className="progress" now={ this.completedNetPayoutAmount } max={ this.projectedNetAmount } />
-							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
+							<FormControl readOnly value={ NumberUtils.formatCurrency(this.completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 						</Form.Group>				
 						<Form.Group>
 							<Form.Label>Net Earnings</Form.Label>
 							<ProgressBar className="progress" now={ this.completedNetEarnings } max={ this.netEarnings } />
-							<FormControl size="lg" readOnly value={ NumberUtils.formatCurrency(this.completedNetEarnings) + " out of " + NumberUtils.formatCurrency(this.netEarnings) } />
+							<FormControl readOnly value={ NumberUtils.formatCurrency(this.completedNetEarnings) + " out of " + NumberUtils.formatCurrency(this.netEarnings) } />
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Completed Projects</Form.Label>
 							<ProgressBar className="progress" now={ this.completedProjects } max={ this.numOngoingProjects } />
-							<FormControl size="lg" readOnly value={ this.completedProjects + " out of " + this.numOngoingProjects } />
+							<FormControl readOnly value={ this.completedProjects + " out of " + this.numOngoingProjects } />
 						</Form.Group>		
 					</Col>
-					<Col md="6">
+					<Col md="4">
 						<Form.Group>
 							<Form.Label>Net Interest Rate per annum</Form.Label>
 							<ProgressBar className="progress" now={ (this.netInterestRateStats["avg"] * 100) } max="20" />
-							<FormControl size="lg" readOnly
-								value={ "Avg: " + (this.netInterestRateStats["avg"] * 100).toFixed(2) + "%, "
-											+ "High: " + (this.netInterestRateStats["high"] * 100).toFixed(2) + "%, "
-											+ "Low: " + (this.netInterestRateStats["low"] * 100).toFixed(2) + "%" } />
+							<InputGroup className="mb-3">
+								<InputGroup.Prepend>
+									<InputGroup.Text>Avg</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateStats["avg"] * 100).toFixed(2) + "%" } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>High</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateStats["high"] * 100).toFixed(2) + "%" } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>Low</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateStats["low"] * 100).toFixed(2) + "%" } />
+							</InputGroup>							
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Net Interest Rate after Tenure</Form.Label>
 							<ProgressBar className="progress" now={ this.netInterestRateAfterTenureStats["avg"] * 100 } max="20" />
-							<FormControl size="lg" readOnly 
-								value={ "Avg: " + (this.netInterestRateAfterTenureStats["avg"] * 100).toFixed(2) + "%, "
-											+ "High: " + (this.netInterestRateAfterTenureStats["high"] * 100).toFixed(2) + "%, "
-											+ "Low: " + (this.netInterestRateAfterTenureStats["low"] * 100).toFixed(2) + "%" } />
+							<InputGroup className="mb-3">
+								<InputGroup.Prepend>
+									<InputGroup.Text>Avg</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["avg"] * 100).toFixed(2) + "%" } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>High</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["high"] * 100).toFixed(2) + "%" } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>Low</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["low"] * 100).toFixed(2) + "%" } />
+							</InputGroup>
 						</Form.Group>
 						<Form.Group>
-							<Form.Label>Project Tenure</Form.Label>
+							<Form.Label>Project Tenure (months)</Form.Label>
 							<ProgressBar className="progress" now={ this.tenureStats["avg"] } max="12" />
-							<FormControl size="lg" readOnly 
-								value={ "Avg: " + parseInt(this.tenureStats["avg"]) + " month(s), " 
-											+ "High: " + this.tenureStats["high"] + " month(s), " 
-											+ "Low: " + this.tenureStats["low"] + " month(s)" } />
+							<InputGroup className="mb-3">
+								<InputGroup.Prepend>
+									<InputGroup.Text>Avg</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ parseInt(this.tenureStats["avg"]) } /> 
+								<InputGroup.Prepend>
+									<InputGroup.Text>High</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ this.tenureStats["high"] } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>Low</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ this.tenureStats["low"] } />
+							</InputGroup>
 						</Form.Group>
 						<Form.Group>
-							<Form.Label>Subscription Days</Form.Label>
+							<Form.Label>Subscription Length (days)</Form.Label>
 							<ProgressBar className="progress" now={ this.subscriptionDaysStats["avg"] } max="30" />
-							<FormControl size="lg" readOnly 
-								value={ "Avg: " + parseInt(this.subscriptionDaysStats["avg"]) + " day(s), " 
-											+ "High: " + this.subscriptionDaysStats["high"] + " day(s), "
-											+ "Low: " + this.subscriptionDaysStats["low"] + " day(s)"} />
-						</Form.Group>
+							<InputGroup className="mb-3">
+								<InputGroup.Prepend>
+									<InputGroup.Text>Avg</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ parseInt(this.subscriptionDaysStats["avg"]) } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>High</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ this.subscriptionDaysStats["high"] } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>Low</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ this.subscriptionDaysStats["low"] } />
+							</InputGroup>
+						</Form.Group>						
+					</Col>
+					<Col md="4">
 						<Form.Group>
-							<Form.Label>Days before participating on another Project</Form.Label>
+							<Form.Label>Days before participating on another project</Form.Label>
 							<ProgressBar className="progress" now={ this.idleDaysStats["avg"] } max="30" />
-							<FormControl size="lg" readOnly 
-								value={ "Avg: " + parseInt(this.idleDaysStats["avg"]) + " day(s), " 
-											+ "High: " + this.idleDaysStats["high"] + " day(s), "
-											+ "Low: " + this.idleDaysStats["low"] + " day(s)"} />
+							<InputGroup className="mb-3">
+								<InputGroup.Prepend>
+									<InputGroup.Text>Avg</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ parseInt(this.idleDaysStats["avg"]) } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>High</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ this.idleDaysStats["high"] } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>Low</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ this.idleDaysStats["low"] } />
+							</InputGroup>
 						</Form.Group>
 					</Col>
 				</Row>
 				<Row>
 					<Col md="12" style={{ textAlign: "center", marginBottom: "1rem" }}>
-						<ButtonGroup className="mb-2">
+						<ButtonGroup size="lg" className="mb-2">
 							<Button onClick={ ()=> { this.handleCreatePinClick(); } }>Pin Report</Button>
 							<Button variant="dark" onClick={ () => { this.setState({"showPinReportHelp": true}) } }>?</Button>
 						</ButtonGroup>						

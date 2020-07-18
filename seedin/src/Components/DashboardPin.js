@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Form, FormControl, ProgressBar, Button } from "react-bootstrap";
+import { InputGroup, Card, Form, FormControl, ProgressBar, Button } from "react-bootstrap";
 import NumberUtils from "../Entities/NumberUtils";
 
 // A dashboard pin is a pinned report
@@ -44,42 +44,92 @@ class DashboardPin extends React.Component {
                 <Form.Group>
                     <Form.Label>Net Interest Rate per annum</Form.Label>
                     <ProgressBar className="progress" now={ (properties["netInterestRateStats"]["avg"] * 100) } max="20" />
-                    <FormControl size="sm" readOnly
-                        value={ "Avg: " + (properties["netInterestRateStats"]["avg"] * 100).toFixed(2) + "%, "
-                                    + "High: " + (properties["netInterestRateStats"]["high"] * 100).toFixed(2) + "%, "
-                                    + "Low: " + (properties["netInterestRateStats"]["low"] * 100).toFixed(2) + "%" } />
+                    <InputGroup size="sm" className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Avg</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ (properties["netInterestRateStats"]["avg"] * 100).toFixed(2) + "%" } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>High</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ (properties["netInterestRateStats"]["high"] * 100).toFixed(2) + "%" } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Low</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ (properties["netInterestRateStats"]["low"] * 100).toFixed(2) + "%" } />
+                    </InputGroup>							
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Net Interest Rate after Tenure</Form.Label>
                     <ProgressBar className="progress" now={ properties["netInterestRateAfterTenureStats"]["avg"] * 100 } max="20" />
-                    <FormControl size="sm" readOnly 
-                        value={ "Avg: " + (properties["netInterestRateAfterTenureStats"]["avg"] * 100).toFixed(2) + "%, "
-                                    + "High: " + (properties["netInterestRateAfterTenureStats"]["high"] * 100).toFixed(2) + "%, "
-                                    + "Low: " + (properties["netInterestRateAfterTenureStats"]["low"] * 100).toFixed(2) + "%" } />
+                    <InputGroup size="sm" className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Avg</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ (properties["netInterestRateAfterTenureStats"]["avg"] * 100).toFixed(2) + "%" } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>High</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ (properties["netInterestRateAfterTenureStats"]["high"] * 100).toFixed(2) + "%" } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Low</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ (properties["netInterestRateAfterTenureStats"]["low"] * 100).toFixed(2) + "%" } />
+                    </InputGroup>
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Project Tenure</Form.Label>
+                    <Form.Label>Project Tenure (months)</Form.Label>
                     <ProgressBar className="progress" now={ properties["tenureStats"]["avg"] } max="12" />
-                    <FormControl size="sm" readOnly 
-                        value={ "Avg: " + parseInt(properties["tenureStats"]["avg"]) + " month(s), " 
-                                    + "High: " + properties["tenureStats"]["high"] + " month(s), " 
-                                    + "Low: " + properties["tenureStats"]["low"] + " month(s)" } />
+                    <InputGroup size="sm" className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Avg</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ parseInt(properties["tenureStats"]["avg"]) } /> 
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>High</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ properties["tenureStats"]["high"] } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Low</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ properties["tenureStats"]["low"] } />
+                    </InputGroup>
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Subscription Days</Form.Label>
+                    <Form.Label>Subscription Length (days)</Form.Label>
                     <ProgressBar className="progress" now={ properties["subscriptionDaysStats"]["avg"] } max="30" />
-                    <FormControl size="sm" readOnly 
-                        value={ "Avg: " + parseInt(properties["subscriptionDaysStats"]["avg"]) + " day(s), " 
-                                    + "High: " + properties["subscriptionDaysStats"]["high"] + " day(s), "
-                                    + "Low: " + properties["subscriptionDaysStats"]["low"] + " day(s)"} />
+                    <InputGroup size="sm" className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Avg</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ parseInt(properties["subscriptionDaysStats"]["avg"]) } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>High</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ properties["subscriptionDaysStats"]["high"] } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Low</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ properties["subscriptionDaysStats"]["low"] } />
+                    </InputGroup>
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Days before participating on another Project</Form.Label>
+                    <Form.Label>Days before participating on another project</Form.Label>
                     <ProgressBar className="progress" now={ properties["idleDaysStats"]["avg"] } max="30" />
-                    <FormControl size="sm" readOnly 
-                        value={ "Avg: " + parseInt(properties["idleDaysStats"]["avg"]) + " day(s), " 
-                                    + "High: " + properties["idleDaysStats"]["high"] + " day(s), "
-                                    + "Low: " + properties["idleDaysStats"]["low"] + " day(s)"} />
+                    <InputGroup size="sm" className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Avg</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ parseInt(properties["idleDaysStats"]["avg"]) } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>High</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ properties["idleDaysStats"]["high"] } />
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Low</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl readOnly value={ properties["idleDaysStats"]["low"] } />
+                    </InputGroup>
                 </Form.Group>
             </Card.Body>
             <Card.Footer style={{ textAlign: "center" }}>
