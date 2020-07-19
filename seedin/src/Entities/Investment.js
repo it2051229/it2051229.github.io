@@ -289,11 +289,11 @@ class Investment {
 
         for(var i = 0; i < investments.length; i++) {
             var investment = investments[i];
-            var firstPayDate = investment.properties["date"];
+            var openDate = investment.getOpenDate();
             var lastPayDate = investment.calculateMaturityDate();
             
-            if(earliestDate === null || firstPayDate.compareTo(earliestDate) < 0)
-                earliestDate = firstPayDate;
+            if(earliestDate === null || openDate.compareTo(earliestDate) < 0)
+                earliestDate = openDate;
 
             if(latestDate === null || lastPayDate.compareTo(latestDate) > 0)
                 latestDate = lastPayDate;

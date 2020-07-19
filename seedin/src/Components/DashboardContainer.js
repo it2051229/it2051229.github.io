@@ -124,14 +124,19 @@ class DashboardContainer extends React.Component {
 					return investmentA.properties["propertyId"] - investmentB.properties["propertyId"];
 				});
 
+				console.log(filteredInvestments);
+
 				// Calculate the total idle days
 				var totalIdleDays = 0;
 
 				for(var k = 1; k < filteredInvestments.length; k++) {
-					var idleDays = filteredInvestments[k].getOpenDate().daysBetween(filteredInvestments[k - 1].getOpenDate());
+					var idleDays = filteredInvestments[k - 1].getOpenDate().daysBetween(filteredInvestments[k].getOpenDate());
 
-					if(k === 1 || idleDays > this.idleDaysStats["high"])
+					if(k === 1 || idleDays > this.idleDaysStats["high"]) {
 						this.idleDaysStats["high"] = idleDays;
+						
+						console.log(idleDays + " days === from: " + filteredInvestments[k - 1].getOpenDate() + " - to: " + filteredInvestments[k].getOpenDate());
+					}
 
 					if(k === 1 || idleDays < this.idleDaysStats["low"])
 						this.idleDaysStats["low"] = idleDays;
@@ -228,7 +233,7 @@ class DashboardContainer extends React.Component {
 
 			this.numOngoingProjects = filteredInvestments.length - numOnHold;
 			this.gainPercent = (((this.projectedNetAmount - this.amountInvested) / this.amountInvested) * 100).toFixed(2);
-	
+			
 			if(isNaN(this.gainPercent))
 				this.gainPercent = 0;
 
@@ -337,7 +342,7 @@ class DashboardContainer extends React.Component {
 					<Col md="4">
 						<Form.Group>
 							<Form.Label>Amount Invested / Projected Net</Form.Label>
-							<ProgressBar className="progress" now={ this.gainPercent } max="20" />
+							<ProgressBar className="progress" now={ this.gainPercent > 0 ? this.gainPercent: 0  } max="20" />
 							<InputGroup className="mb-3">
 								<FormControl readOnly value={ NumberUtils.formatCurrency(this.amountInvested) + " / " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 								<InputGroup.Append>
