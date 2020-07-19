@@ -124,19 +124,14 @@ class DashboardContainer extends React.Component {
 					return investmentA.properties["propertyId"] - investmentB.properties["propertyId"];
 				});
 
-				console.log(filteredInvestments);
-
 				// Calculate the total idle days
 				var totalIdleDays = 0;
 
 				for(var k = 1; k < filteredInvestments.length; k++) {
 					var idleDays = filteredInvestments[k - 1].getOpenDate().daysBetween(filteredInvestments[k].getOpenDate());
 
-					if(k === 1 || idleDays > this.idleDaysStats["high"]) {
-						this.idleDaysStats["high"] = idleDays;
-						
-						console.log(idleDays + " days === from: " + filteredInvestments[k - 1].getOpenDate() + " - to: " + filteredInvestments[k].getOpenDate());
-					}
+					if(k === 1 || idleDays > this.idleDaysStats["high"])
+						this.idleDaysStats["high"] = idleDays;						
 
 					if(k === 1 || idleDays < this.idleDaysStats["low"])
 						this.idleDaysStats["low"] = idleDays;
@@ -352,17 +347,17 @@ class DashboardContainer extends React.Component {
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Net Payout</Form.Label>
-							<ProgressBar className="progress" now={ this.completedNetPayoutAmount } max={ this.projectedNetAmount } />
+							<ProgressBar className="progress" now={ this.completedNetPayoutAmount } max={ this.projectedNetAmount > 0 ? this.projectedNetAmount : 100 } />
 							<FormControl readOnly value={ NumberUtils.formatCurrency(this.completedNetPayoutAmount) + " out of " + NumberUtils.formatCurrency(this.projectedNetAmount) } />
 						</Form.Group>				
 						<Form.Group>
 							<Form.Label>Net Earnings</Form.Label>
-							<ProgressBar className="progress" now={ this.completedNetEarnings } max={ this.netEarnings } />
+							<ProgressBar className="progress" now={ this.completedNetEarnings } max={ this.netEarnings > 0 ? this.netEarnings : 100 } />
 							<FormControl readOnly value={ NumberUtils.formatCurrency(this.completedNetEarnings) + " out of " + NumberUtils.formatCurrency(this.netEarnings) } />
 						</Form.Group>
 						<Form.Group>
 							<Form.Label>Completed Projects</Form.Label>
-							<ProgressBar className="progress" now={ this.completedProjects } max={ this.numOngoingProjects } />
+							<ProgressBar className="progress" now={ this.completedProjects } max={ this.numOngoingProjects > 0 ? this.numOngoingProjects : 100 } />
 							<FormControl readOnly value={ this.completedProjects + " out of " + this.numOngoingProjects } />
 						</Form.Group>		
 					</Col>

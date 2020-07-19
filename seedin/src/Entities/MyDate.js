@@ -8,6 +8,27 @@ class MyDate {
             "month": month,
             "day": day
         };    
+
+        // Validate the date
+        if(isNaN(year) || isNaN(month) || isNaN(day))
+            throw new Error("Year, month, and/or day should be a number.");
+        
+        // Validate the year
+        if(year < 1900)
+            throw new Error("Year cannot go below 1900.");
+
+        // Validate the month
+        if(month < 1 || month > 12)
+            throw new Error("Month should be 1 to 12");
+
+        // Validate the day
+        var daysEachMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        if(MyDate.isLeapYear(year))
+            daysEachMonth[1] = 29;
+
+        if(day < 1 || day > daysEachMonth[month - 1])
+            throw new Error("Invalid day in month range.");
     }
 
     // Compare if this date goes before, equal or after the other date

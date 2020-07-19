@@ -115,20 +115,27 @@ class InvestmentForm extends React.Component {
             return null;
 		}
 		
-		// Calculate the net interest rate
-        var investment = new Investment(
-			this.state.projectId, 
-            parseFloat(this.state.investedAmount), 
-            parseFloat(this.state.grossInterestRate) / 100.0,  
-            MyDate.toMyDate(date), 
-            this.state.repaymentMethod,
-            parseInt(this.state.tenure),
-            this.state.status);
+        // Calculate the net interest rate
+        try {
+            var investment = new Investment(
+                this.state.projectId, 
+                parseFloat(this.state.investedAmount), 
+                parseFloat(this.state.grossInterestRate) / 100.0,  
+                MyDate.toMyDate(date), 
+                this.state.repaymentMethod,
+                parseInt(this.state.tenure),
+                this.state.status);
 
-        investment.properties["projectUrl"] = this.state.projectUrl;
-		investment.properties["issuer"] = this.state.loanee.toUpperCase();
-		
-        return investment;
+            investment.properties["projectUrl"] = this.state.projectUrl;
+            investment.properties["issuer"] = this.state.loanee.toUpperCase();
+            
+            return investment;
+        } catch(err) {
+            alert("The project ID is invalid, make sure it follows SeedIn's format because it represents the opening date. If this project is invested, make sure the first pay date is after the opening date.");
+            console.log(err);
+        }
+
+        return null;
 	}
 
 	// Validate and add a new investment

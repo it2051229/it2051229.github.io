@@ -3,18 +3,22 @@ import MyDate from "./MyDate"
 class Investment {
 
     // Create a new investment object
-    constructor(id, amount, interestRate, date, repaymentMethod, tenure, status) {
+    constructor(id, amount, interestRate, firstPayDate, repaymentMethod, tenure, status) {
         this.properties = {
             "projectId": id,
             "investmentAmount": amount,
             "grossInterestRate": interestRate,
-            "date": date,
+            "date": firstPayDate, 
             "repaymentMethod": repaymentMethod,
             "tenure": tenure,
             "projectUrl": "",
             "issuer": "",
             "status": status
         };
+
+        // This will throw an exception if the date is invalid
+        if(this.getOpenDate().compareTo(firstPayDate) > 0)
+            throw new Error("Open date goes after the first pay date.");
     }
 
     // Return the proeprties of the date as a JSON
