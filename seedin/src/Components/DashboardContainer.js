@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, ButtonGroup, Modal, Alert, Form, FormControl, Row, Col, InputGroup, ProgressBar } from "react-bootstrap";
+import { Table, Button, ButtonGroup, Modal, Alert, Form, FormControl, Row, Col, InputGroup, ProgressBar } from "react-bootstrap";
 import Database from "../Entities/Database";
 import Investment from "../Entities/Investment";
 import MyDate from "../Entities/MyDate";
@@ -29,6 +29,8 @@ class DashboardContainer extends React.Component {
 			"issuer": "All",
 			"showNegativeGainExplanation": false,
 			"showPinReportHelp": false,
+			"showInterestRateDistribution": false,
+			"showTenureDistribution": false,
 			"pins": this.database.getPins()
 		};
 
@@ -110,6 +112,9 @@ class DashboardContainer extends React.Component {
 		this.subscriptionDaysStats = { "avg": 0, "low": 0, "high": 0 };
 		this.idleDaysStats = { "avg": 0, "low": 0, "high": 0 };
 
+		this.interestRateDistribution = {};
+		this.tenureDistribution = {};
+
 		var filteredInvestments = [];
 
 		// Proceed only with the calculation on validate dates
@@ -153,6 +158,23 @@ class DashboardContainer extends React.Component {
 					numOnHold++;
 					onHoldAmount += investment.properties["investmentAmount"];
 					continue;
+				}
+
+				// Update the distribution of interest rates
+				if(!(investment.properties["grossInterestRate"] in this.interestRateDistribution)) {
+					this.interestRateDistribution[investment.properties["grossInterestRate"]] = { 
+						"netInterestRate":  investment.calculateNetInterestRate(),
+						"frequency": 0
+					};
+				}
+
+				this.interestRateDistribution[investment.properties["grossInterestRate"]].frequency++;
+
+				// Update the distribution of tenure
+				if(!(investment.properties["tenure"] in this.tenureDistribution)) {
+					this.tenureDistribution[investment.properties["tenure"]] = 1;
+				} else {
+					this.tenureDistribution[investment.properties["tenure"]]++;
 				}
 
 				// Update net interest stats
@@ -363,6 +385,7 @@ class DashboardContainer extends React.Component {
 					</Col>
 					<Col md="4">
 						<Form.Group>
+							<Button onClick={ () => { this.setState({"showInterestRateDistribution": true}) } } variant="link" style={{ padding: 0, margin: 0 }} className="float-right"><small>Distribution</small></Button>
 							<Form.Label>Net Interest Rate per annum</Form.Label>
 							<ProgressBar className="progress" now={ (this.netInterestRateStats["avg"] * 100) } max="20" />
 							<InputGroup className="mb-3">
@@ -399,6 +422,7 @@ class DashboardContainer extends React.Component {
 							</InputGroup>
 						</Form.Group>
 						<Form.Group>
+						<Button onClick={ () => { this.setState({"showTenureDistribution": true}) } } variant="link" style={{ padding: 0, margin: 0 }} className="float-right"><small>Distribution</small></Button>
 							<Form.Label>Project Tenure (months)</Form.Label>
 							<ProgressBar className="progress" now={ this.tenureStats["avg"] } max="12" />
 							<InputGroup className="mb-3">
@@ -467,6 +491,58 @@ class DashboardContainer extends React.Component {
 				<Row>		
 					{ pins }
 				</Row>
+				<Modal show={this.state.showInterestRateDistribution} onHide={(e) => { this.setState({"showInterestRateDistribution": false}) }}>
+					<Modal.Header closeButton>
+						<Modal.Title>Interest Rate Distribution</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<Table responsive striped bordered hover variant="dark">
+                            <thead>
+                                <tr>
+                                    <th className="align-middle">Gross % p.a.</th>
+                                    <th className="align-middle">Net % p.a.</th>
+                                    <th className="align-middle">Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+								{
+									Object.keys(this.interestRateDistribution).sort().map((grossInterestRate) => {
+										return <tr>
+											<td>{ (grossInterestRate * 100).toFixed(2) }%</td>
+											<td>{ (this.interestRateDistribution[grossInterestRate]["netInterestRate"] * 100).toFixed(2) }%</td>
+											<td>{ (this.interestRateDistribution[grossInterestRate]["frequency"]) }</td>
+										</tr>
+									})
+								}
+							</tbody>
+                        </Table>
+					</Modal.Body>
+				</Modal>
+				<Modal show={this.state.showTenureDistribution} onHide={(e) => { this.setState({"showTenureDistribution": false}) }}>
+					<Modal.Header>
+						<Modal.Title>Tenure Distribution</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+					<Table responsive striped bordered hover variant="dark">
+                            <thead>
+                                <tr>
+                                    <th className="align-middle">Tenure</th>
+                                    <th className="align-middle">Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+								{
+									Object.keys(this.tenureDistribution).sort(function(a, b) { return a - b }).map((tenure) => {
+										return <tr>
+											<td>{ tenure } month(s)</td>
+											<td>{ this.tenureDistribution[tenure] }</td>
+										</tr>
+									})
+								}
+							</tbody>
+                        </Table>
+					</Modal.Body>					
+				</Modal>
 				<Modal show={this.state.showNegativeGainExplanation} onHide={(e) => { this.setState({"showNegativeGainExplanation": false}) }}>
 					<Modal.Header closeButton>
 						<Modal.Title>Negative Gain</Modal.Title>
