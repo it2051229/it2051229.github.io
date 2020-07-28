@@ -519,7 +519,7 @@ class DashboardContainer extends React.Component {
 					</Modal.Body>
 				</Modal>
 				<Modal show={this.state.showTenureDistribution} onHide={(e) => { this.setState({"showTenureDistribution": false}) }}>
-					<Modal.Header>
+					<Modal.Header closeButton>
 						<Modal.Title>Tenure Distribution</Modal.Title>
 					</Modal.Header>
 					<Modal.Body>
