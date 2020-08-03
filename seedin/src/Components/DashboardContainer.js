@@ -31,6 +31,7 @@ class DashboardContainer extends React.Component {
 			"showPinReportHelp": false,
 			"showInterestRateDistribution": false,
 			"showTenureDistribution": false,
+			"showInterestRateByTenureDistribution": false,
 			"pins": this.database.getPins()
 		};
 
@@ -114,6 +115,7 @@ class DashboardContainer extends React.Component {
 
 		this.interestRateDistribution = {};
 		this.tenureDistribution = {};
+		this.interestRateTenureDistribution = {};
 
 		var filteredInvestments = [];
 
@@ -175,6 +177,15 @@ class DashboardContainer extends React.Component {
 					this.tenureDistribution[investment.properties["tenure"]] = 1;
 				} else {
 					this.tenureDistribution[investment.properties["tenure"]]++;
+				}
+
+				// Update the distribution of interest rate and tenure
+				var interestRateByTenure = (investment.properties["grossInterestRate"] * 100).toFixed(2) + "% @ " + investment.properties["tenure"] + " month(s)";
+
+				if(!(interestRateByTenure in this.interestRateTenureDistribution)) {
+					this.interestRateTenureDistribution[interestRateByTenure] = 1;
+				} else {
+					this.interestRateTenureDistribution[interestRateByTenure]++;
 				}
 
 				// Update net interest stats
@@ -305,6 +316,8 @@ class DashboardContainer extends React.Component {
 			});
 		}
 
+		console.log(this.interestRateTenureDistribution);
+
 		return (
 			<>
 				<Row>
@@ -404,25 +417,7 @@ class DashboardContainer extends React.Component {
 							</InputGroup>							
 						</Form.Group>
 						<Form.Group>
-							<Form.Label>Net Interest Rate after Tenure</Form.Label>
-							<ProgressBar className="progress" now={ this.netInterestRateAfterTenureStats["avg"] * 100 } max="20" />
-							<InputGroup className="mb-3">
-								<InputGroup.Prepend>
-									<InputGroup.Text>Avg</InputGroup.Text>
-								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["avg"] * 100).toFixed(2) + "%" } />
-								<InputGroup.Prepend>
-									<InputGroup.Text>High</InputGroup.Text>
-								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["high"] * 100).toFixed(2) + "%" } />
-								<InputGroup.Prepend>
-									<InputGroup.Text>Low</InputGroup.Text>
-								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["low"] * 100).toFixed(2) + "%" } />
-							</InputGroup>
-						</Form.Group>
-						<Form.Group>
-						<Button onClick={ () => { this.setState({"showTenureDistribution": true}) } } variant="link" style={{ padding: 0, margin: 0 }} className="float-right"><small>Distribution</small></Button>
+							<Button onClick={ () => { this.setState({"showTenureDistribution": true}) } } variant="link" style={{ padding: 0, margin: 0 }} className="float-right"><small>Distribution</small></Button>
 							<Form.Label>Project Tenure (months)</Form.Label>
 							<ProgressBar className="progress" now={ this.tenureStats["avg"] } max="12" />
 							<InputGroup className="mb-3">
@@ -440,6 +435,25 @@ class DashboardContainer extends React.Component {
 								<FormControl readOnly value={ this.tenureStats["low"] } />
 							</InputGroup>
 						</Form.Group>
+						<Form.Group>
+							<Button onClick={ () => { this.setState({"showInterestRateByTenureDistribution": true}) } } variant="link" style={{ padding:0, margin: 0 }} className="float-right"><small>Distribution</small></Button>
+							<Form.Label>Net Interest Rate after Tenure</Form.Label>
+							<ProgressBar className="progress" now={ this.netInterestRateAfterTenureStats["avg"] * 100 } max="20" />
+							<InputGroup className="mb-3">
+								<InputGroup.Prepend>
+									<InputGroup.Text>Avg</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["avg"] * 100).toFixed(2) + "%" } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>High</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["high"] * 100).toFixed(2) + "%" } />
+								<InputGroup.Prepend>
+									<InputGroup.Text>Low</InputGroup.Text>
+								</InputGroup.Prepend>
+								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["low"] * 100).toFixed(2) + "%" } />
+							</InputGroup>
+						</Form.Group>						
 						<Form.Group>
 							<Form.Label>Subscription Length (days)</Form.Label>
 							<ProgressBar className="progress" now={ this.subscriptionDaysStats["avg"] } max="30" />
@@ -523,7 +537,7 @@ class DashboardContainer extends React.Component {
 						<Modal.Title>Tenure Distribution</Modal.Title>
 					</Modal.Header>
 					<Modal.Body>
-					<Table responsive striped bordered hover variant="dark">
+						<Table responsive striped bordered hover variant="dark">
                             <thead>
                                 <tr>
                                     <th className="align-middle">Tenure</th>
@@ -542,6 +556,31 @@ class DashboardContainer extends React.Component {
 							</tbody>
                         </Table>
 					</Modal.Body>					
+				</Modal>
+				<Modal show={this.state.showInterestRateByTenureDistribution} onHide={(e) => { this.setState({"showInterestRateByTenureDistribution": false}) }}>
+					<Modal.Header closeButton>
+						<Modal.Title>Interest Rate x Tenure Distribution</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<Table responsive striped bordered hover variant="dark">
+							<thead>
+								<tr>
+									<th className="align-middle">Gross Interest Rate</th>
+									<th className="align-middle">Frequency</th>
+								</tr>								
+							</thead>
+							<tbody>
+								{
+									Object.keys(this.interestRateTenureDistribution).sort(function(a, b) { return a.localeCompare(b) }).map((interestAtTenure) => {
+										return <tr>
+											<td>{ interestAtTenure }</td>
+											<td>{ this.interestRateTenureDistribution[interestAtTenure] }</td>
+										</tr>
+									})
+								}
+							</tbody>
+						</Table>
+					</Modal.Body>
 				</Modal>
 				<Modal show={this.state.showNegativeGainExplanation} onHide={(e) => { this.setState({"showNegativeGainExplanation": false}) }}>
 					<Modal.Header closeButton>
