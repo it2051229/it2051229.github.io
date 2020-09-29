@@ -162,6 +162,9 @@ class Investment {
         var monthlyCapitalAmount = this.calculateMonthlyCapitalPayoutAmount();
         var currentDate = MyDate.copy(this.properties["date"]);
 
+        if(this.properties["status"] === "On Hold")
+            currentDate.properties["day"] = 1;
+
         for(var i = 0; i < this.properties["tenure"]; i++) {
             var netPayout =  monthlyNetInterestPayoutAmount + monthlyCapitalAmount;
             
