@@ -128,7 +128,7 @@ class DashboardContainer extends React.Component {
 			// Sort the investments by project ID, the project ID is the date and that's how we can compute the idle days
 			if(filteredInvestments.length > 0) {
 				filteredInvestments.sort((investmentA, investmentB) => {
-					return investmentA.properties["propertyId"] - investmentB.properties["propertyId"];
+					return investmentA.properties["projectId"] - investmentB.properties["projectId"];
 				});
 
 				// Calculate the total idle days

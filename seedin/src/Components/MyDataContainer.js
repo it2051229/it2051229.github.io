@@ -53,7 +53,6 @@ class MyDataContainer extends React.Component {
 			return;
 
 		this.database.clear();
-		localStorage.clear();
 		window.alert("Clear successful.");		
 	}
 

@@ -1,0 +1,17 @@
+body {
+    padding-top: 5rem;
+    padding-bottom: 1rem;
+}
+
+#investmentsTable tr {
+    cursor: pointer;
+}
+
+.progress {
+    margin-bottom: 3px;
+    height: 5px;
+}
+
+.clickable-alert {
+    cursor: pointer;
+}
