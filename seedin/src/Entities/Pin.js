@@ -13,9 +13,9 @@ class Pin {
         completedProjects, 
         gainPercent, 
         numOngoingProjects,
-		netInterestRateStats,
+		grossInterestRateStats,
 		tenureStats,
-		netInterestRateAfterTenureStats,
+		grossInterestRateAfterTenureStats,
 		subscriptionDaysStats,
 		idleDaysStats) {
         
@@ -32,9 +32,9 @@ class Pin {
 			"completedProjects": completedProjects,
 			"gainPercent": gainPercent,
 			"numOngoingProjects": numOngoingProjects,
-			"netInterestRateStats": netInterestRateStats,
+			"grossInterestRateStats": grossInterestRateStats,
 			"tenureStats": tenureStats,
-			"netInterestRateAfterTenureStats": netInterestRateAfterTenureStats,
+			"grossInterestRateAfterTenureStats": grossInterestRateAfterTenureStats,
 			"subscriptionDaysStats": subscriptionDaysStats,
 			"idleDaysStats": idleDaysStats
 		}
@@ -60,9 +60,9 @@ class Pin {
 			"completedProjects": this.properties["completedProjects"],
 			"gainPercent": this.properties["gainPercent"],
 			"numOngoingProjects": this.properties["numOngoingProjects"],
-			"netInterestRateStats": this.properties["netInterestRateStats"],
+			"grossInterestRateStats": this.properties["grossInterestRateStats"],
 			"tenureStats": this.properties["tenureStats"],
-			"netInterestRateAfterTenureStats": this.properties["netInterestRateAfterTenureStats"],
+			"grossInterestRateAfterTenureStats": this.properties["grossInterestRateAfterTenureStats"],
 			"subscriptionDaysStats": this.properties["subscriptionDaysStats"],
 			"idleDaysStats": this.properties["idleDaysStats"]
         }
@@ -83,9 +83,9 @@ class Pin {
 			json["completedProjects"],
 			json["gainPercent"],
 			json["numOngoingProjects"],
-			json["netInterestRateStats"],
+			json["grossInterestRateStats"],
 			json["tenureStats"],
-			json["netInterestRateAfterTenureStats"],
+			json["grossInterestRateAfterTenureStats"],
 			json["subscriptionDaysStats"],
 			json["idleDaysStats"]
         );

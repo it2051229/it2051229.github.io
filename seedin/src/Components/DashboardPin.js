@@ -47,39 +47,39 @@ class DashboardPin extends React.Component {
                     <FormControl size="sm" readOnly value={ properties["completedProjects"] + " out of " + properties["numOngoingProjects"] } />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Net Interest Rate per annum</Form.Label>
-                    <ProgressBar className="progress" now={ (properties["netInterestRateStats"]["avg"] * 100) } max="20" />
+                    <Form.Label>Gross Interest Rate per annum</Form.Label>
+                    <ProgressBar className="progress" now={ (properties["grossInterestRateStats"]["avg"] * 100) } max="20" />
                     <InputGroup size="sm" className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text>Avg</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <FormControl readOnly value={ (properties["netInterestRateStats"]["avg"] * 100).toFixed(2) + "%" } />
+                        <FormControl readOnly value={ (properties["grossInterestRateStats"]["avg"] * 100).toFixed(2) + "%" } />
                         <InputGroup.Prepend>
                             <InputGroup.Text>High</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <FormControl readOnly value={ (properties["netInterestRateStats"]["high"] * 100).toFixed(2) + "%" } />
+                        <FormControl readOnly value={ (properties["grossInterestRateStats"]["high"] * 100).toFixed(2) + "%" } />
                         <InputGroup.Prepend>
                             <InputGroup.Text>Low</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <FormControl readOnly value={ (properties["netInterestRateStats"]["low"] * 100).toFixed(2) + "%" } />
+                        <FormControl readOnly value={ (properties["grossInterestRateStats"]["low"] * 100).toFixed(2) + "%" } />
                     </InputGroup>							
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Net Interest Rate after Tenure</Form.Label>
-                    <ProgressBar className="progress" now={ properties["netInterestRateAfterTenureStats"]["avg"] * 100 } max="20" />
+                    <Form.Label>Gross Interest Rate after Tenure</Form.Label>
+                    <ProgressBar className="progress" now={ properties["grossInterestRateAfterTenureStats"]["avg"] * 100 } max="20" />
                     <InputGroup size="sm" className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text>Avg</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <FormControl readOnly value={ (properties["netInterestRateAfterTenureStats"]["avg"] * 100).toFixed(2) + "%" } />
+                        <FormControl readOnly value={ (properties["grossInterestRateAfterTenureStats"]["avg"] * 100).toFixed(2) + "%" } />
                         <InputGroup.Prepend>
                             <InputGroup.Text>High</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <FormControl readOnly value={ (properties["netInterestRateAfterTenureStats"]["high"] * 100).toFixed(2) + "%" } />
+                        <FormControl readOnly value={ (properties["grossInterestRateAfterTenureStats"]["high"] * 100).toFixed(2) + "%" } />
                         <InputGroup.Prepend>
                             <InputGroup.Text>Low</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <FormControl readOnly value={ (properties["netInterestRateAfterTenureStats"]["low"] * 100).toFixed(2) + "%" } />
+                        <FormControl readOnly value={ (properties["grossInterestRateAfterTenureStats"]["low"] * 100).toFixed(2) + "%" } />
                     </InputGroup>
                 </Form.Group>
                 <Form.Group>

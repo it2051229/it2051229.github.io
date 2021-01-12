@@ -64,29 +64,38 @@ class Investment {
     }
 
     // Calculate the net interest rate per annum
-    calculateNetInterestRate() {
+    calculateNetInterestRate(date) {
         var feeRate = 0.30;
+
+        if(date.properties["year"] >= 2021 && date.properties["month"] >= 1 && date.properties["day"] >= 8)
+            feeRate = 0.25;
+
         var netInterestRate = this.properties["grossInterestRate"] * (1 - feeRate);
         return netInterestRate;
     }
 
     // Calculate the interest rate within the tenure only
     calculateTenureInterestRate() {
-        var netInterestRate = this.calculateNetInterestRate();
-        var tenureInterestRate = (netInterestRate / 12.0) * this.properties["tenure"];
+        var schedules = this.generateRepaymentSchedule();
+        var tenureInterestRate = 0;
+
+        for(var i = 0; i < schedules.length; i++) {
+            var monthInterestRate = schedules[i]["netInterestRate"];
+            tenureInterestRate += monthInterestRate;
+        }
+
         return tenureInterestRate;
     }
 
     // Calculate the gain amount within the tenure
     calculateNetGainAmount() {
-        var netGainAmount = this.calculateTenureInterestRate() * this.properties["investmentAmount"];
-        return netGainAmount;
-    }
+        var schedules = this.generateRepaymentSchedule();
+        var netGainAmount = 0;        
+        
+        for(var i = 0; i < schedules.length; i++)
+            netGainAmount += schedules[i]["netInterestPayout"];
 
-    // How much is the interest payout per month
-    calculateMonthlyNetInterestPayoutAmount() {
-        var monthlyInterestRate = this.calculateNetInterestRate() / 12;
-        return this.properties["investmentAmount"] * monthlyInterestRate;
+        return netGainAmount;
     }
 
     // How much of the capital is returned per month
@@ -158,7 +167,6 @@ class Investment {
     // Generate the repayment schedule based on repayment method
     generateRepaymentSchedule() {
         var schedules = [];
-        var monthlyNetInterestPayoutAmount = this.calculateMonthlyNetInterestPayoutAmount();
         var monthlyCapitalAmount = this.calculateMonthlyCapitalPayoutAmount();
         var currentDate = MyDate.copy(this.properties["date"]);
 
@@ -166,6 +174,8 @@ class Investment {
             currentDate.properties["day"] = 1;
 
         for(var i = 0; i < this.properties["tenure"]; i++) {
+            var netInterestRate = this.calculateNetInterestRate(currentDate) / 12;
+            var monthlyNetInterestPayoutAmount = this.properties["investmentAmount"] * netInterestRate;
             var netPayout =  monthlyNetInterestPayoutAmount + monthlyCapitalAmount;
             
             // Balloon will have all the capital amount on the last month
@@ -174,6 +184,7 @@ class Investment {
             
             var schedule = {
                 "date": currentDate,
+                "netInterestRate": netInterestRate,
                 "netInterestPayout": monthlyNetInterestPayoutAmount,
                 "netPayout": netPayout
             }

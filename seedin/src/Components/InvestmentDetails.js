@@ -7,7 +7,6 @@ class InvestmentDetails extends React.Component {
 
 	// Display the calculated details of an investment
 	render() {
-        let netInterestRate = "...";
         let netGainRate = "...";
         let netGainAmount = "...";
         let netTotalPayoutAmount = "...";
@@ -16,7 +15,6 @@ class InvestmentDetails extends React.Component {
 
         // If an investment is provided then display the details
         if(this.props.investment !== null) {            
-            netInterestRate = (this.props.investment.calculateNetInterestRate() * 100).toFixed(2) + "%";
             netGainRate = (this.props.investment.calculateTenureInterestRate() * 100).toFixed(2) + "%";
             netGainAmount = this.props.investment.calculateNetGainAmount();
             netTotalPayoutAmount = this.props.investment.properties["investmentAmount"] + netGainAmount;
@@ -43,10 +41,6 @@ class InvestmentDetails extends React.Component {
 			<>
 				<h2>Investment Details</h2>
                 <Form>
-                    <Form.Group>
-                        <Form.Label>Net Interest Rate per annum</Form.Label>
-                        <Form.Control type="text" readOnly value={netInterestRate} />
-                    </Form.Group>
                     <Form.Group>
                         <Form.Label>Net Gain Rate after Tenure</Form.Label>
                         <Form.Control type="text" readOnly value={netGainRate} />

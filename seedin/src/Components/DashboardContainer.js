@@ -61,9 +61,9 @@ class DashboardContainer extends React.Component {
 			this.completedProjects,
 			this.gainPercent,
 			this.numOngoingProjects,
-			this.netInterestRateStats,
+			this.grossInterestRateStats,
 			this.tenureStats,
-			this.netInterestRateAfterTenureStats,
+			this.grossInterestRateAfterTenureStats,
 			this.subscriptionDaysStats,
 			this.idleDaysStats
 		);
@@ -107,9 +107,9 @@ class DashboardContainer extends React.Component {
 		this.gainPercent = 0;
 		this.numOngoingProjects = 0;
 		
-		this.netInterestRateStats = { "avg": 0, "low": 0, "high": 0};
+		this.grossInterestRateStats = { "avg": 0, "low": 0, "high": 0};
 		this.tenureStats = { "avg": 0, "low": 0, "high": 0 };
-		this.netInterestRateAfterTenureStats = { "avg": 0, "low": 0, "high": 0 };
+		this.grossInterestRateAfterTenureStats = { "avg": 0, "low": 0, "high": 0 };
 		this.subscriptionDaysStats = { "avg": 0, "low": 0, "high": 0 };
 		this.idleDaysStats = { "avg": 0, "low": 0, "high": 0 };
 
@@ -150,7 +150,8 @@ class DashboardContainer extends React.Component {
 				this.idleDaysStats["avg"] = totalIdleDays / filteredInvestments.length;
 			}
 
-			var totalNetInterestRate = 0;	
+			var totalGrossInterestRate = 0;	
+			var totalGrossInterestRateAfterTenure = 0;
 			var totalTenure = 0;
 
 			for(var i = 0; i < filteredInvestments.length; i++) {
@@ -165,7 +166,6 @@ class DashboardContainer extends React.Component {
 				// Update the distribution of interest rates
 				if(!(investment.properties["grossInterestRate"] in this.interestRateDistribution)) {
 					this.interestRateDistribution[investment.properties["grossInterestRate"]] = { 
-						"netInterestRate":  investment.calculateNetInterestRate(),
 						"frequency": 0
 					};
 				}
@@ -188,14 +188,14 @@ class DashboardContainer extends React.Component {
 					this.interestRateTenureDistribution[interestRateByTenure]++;
 				}
 
-				// Update net interest stats
-				var netInterestRate = investment.calculateNetInterestRate();
+				// Update gross interest stats
+				var grossInterestRate = investment.properties["grossInterestRate"];
 
-				if(i === 0 || netInterestRate > this.netInterestRateStats["high"])
-					this.netInterestRateStats["high"] = netInterestRate;
+				if(i === 0 || grossInterestRate > this.grossInterestRateStats["high"])
+					this.grossInterestRateStats["high"] = grossInterestRate;
 				
-				if(i === 0 || netInterestRate < this.netInterestRateStats["low"])
-					this.netInterestRateStats["low"] = netInterestRate;
+				if(i === 0 || grossInterestRate < this.grossInterestRateStats["low"])
+					this.grossInterestRateStats["low"] = grossInterestRate;
 
 				// Update tenure stats
 				var tenure = investment.properties["tenure"];
@@ -206,6 +206,15 @@ class DashboardContainer extends React.Component {
 				if(i === 0 || tenure < this.tenureStats["low"])
 					this.tenureStats["low"] = tenure;
 
+				// Update gross interest rate after tenure stats
+				var grossInterestRateAfterTenure = (investment.properties["grossInterestRate"] / 12) * investment.properties["tenure"];
+
+				if(i === 0 || grossInterestRateAfterTenure > this.grossInterestRateAfterTenureStats["high"])
+					this.grossInterestRateAfterTenureStats["high"] = grossInterestRateAfterTenure;
+				
+				if(i === 0 || grossInterestRateAfterTenure < this.grossInterestRateAfterTenureStats["low"])
+					this.grossInterestRateAfterTenureStats["low"] = grossInterestRateAfterTenure;
+
 				// Update subscription days stats
 				var subscriptionDays = investment.calculateSubscriptionDays();
 
@@ -215,7 +224,8 @@ class DashboardContainer extends React.Component {
 				if(i === 0 || subscriptionDays < this.subscriptionDaysStats["low"])
 					this.subscriptionDaysStats["low"] = subscriptionDays;
 
-				totalNetInterestRate += netInterestRate;
+				totalGrossInterestRate += grossInterestRate;
+				totalGrossInterestRateAfterTenure += grossInterestRateAfterTenure;
 				totalTenure += tenure;
 				totalSubscriptionDays += subscriptionDays;
 	
@@ -267,15 +277,10 @@ class DashboardContainer extends React.Component {
 
 			// Average interest rate calculation
 			if(this.numOngoingProjects > 0) {
-				this.netInterestRateStats["avg"] = totalNetInterestRate / this.numOngoingProjects;
+				this.grossInterestRateStats["avg"] = totalGrossInterestRate / this.numOngoingProjects;
 				this.tenureStats["avg"] = totalTenure / this.numOngoingProjects;
-
-				this.netInterestRateAfterTenureStats["avg"] = ((this.netInterestRateStats["avg"] / 12.0) * this.tenureStats["avg"]);
-				this.netInterestRateAfterTenureStats["high"] = ((this.netInterestRateStats["high"] / 12.0) * this.tenureStats["high"]);
-				this.netInterestRateAfterTenureStats["low"] = ((this.netInterestRateStats["low"] / 12.0) * this.tenureStats["low"]);
-
-				this.subscriptionDaysStats["avg"] = 
-				this.averageNetInterestRateAfterTenure = totalSubscriptionDays / this.numOngoingProjects;
+				this.grossInterestRateAfterTenureStats["avg"] = totalGrossInterestRateAfterTenure / this.numOngoingProjects;
+				this.subscriptionDaysStats["avg"] = totalSubscriptionDays / this.numOngoingProjects;
 			}
 		}
 
@@ -315,8 +320,6 @@ class DashboardContainer extends React.Component {
 				</Col>
 			});
 		}
-
-		console.log(this.interestRateTenureDistribution);
 
 		return (
 			<>
@@ -399,21 +402,21 @@ class DashboardContainer extends React.Component {
 					<Col md="4">
 						<Form.Group>
 							<Button onClick={ () => { this.setState({"showInterestRateDistribution": true}) } } variant="link" style={{ padding: 0, margin: 0 }} className="float-right"><small>Distribution</small></Button>
-							<Form.Label>Net Interest Rate per annum</Form.Label>
-							<ProgressBar className="progress" now={ (this.netInterestRateStats["avg"] * 100) } max="20" />
+							<Form.Label>Gross Interest Rate per annum</Form.Label>
+							<ProgressBar className="progress" now={ (this.grossInterestRateStats["avg"] * 100) } max="20" />
 							<InputGroup className="mb-3">
 								<InputGroup.Prepend>
 									<InputGroup.Text>Avg</InputGroup.Text>
 								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateStats["avg"] * 100).toFixed(2) + "%" } />
+								<FormControl readOnly value={ (this.grossInterestRateStats["avg"] * 100).toFixed(2) + "%" } />
 								<InputGroup.Prepend>
 									<InputGroup.Text>High</InputGroup.Text>
 								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateStats["high"] * 100).toFixed(2) + "%" } />
+								<FormControl readOnly value={ (this.grossInterestRateStats["high"] * 100).toFixed(2) + "%" } />
 								<InputGroup.Prepend>
 									<InputGroup.Text>Low</InputGroup.Text>
 								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateStats["low"] * 100).toFixed(2) + "%" } />
+								<FormControl readOnly value={ (this.grossInterestRateStats["low"] * 100).toFixed(2) + "%" } />
 							</InputGroup>							
 						</Form.Group>
 						<Form.Group>
@@ -437,21 +440,21 @@ class DashboardContainer extends React.Component {
 						</Form.Group>
 						<Form.Group>
 							<Button onClick={ () => { this.setState({"showInterestRateByTenureDistribution": true}) } } variant="link" style={{ padding:0, margin: 0 }} className="float-right"><small>Distribution</small></Button>
-							<Form.Label>Net Interest Rate after Tenure</Form.Label>
-							<ProgressBar className="progress" now={ this.netInterestRateAfterTenureStats["avg"] * 100 } max="20" />
+							<Form.Label>Gross Interest Rate after Tenure</Form.Label>
+							<ProgressBar className="progress" now={ this.grossInterestRateAfterTenureStats["avg"] * 100 } max="20" />
 							<InputGroup className="mb-3">
 								<InputGroup.Prepend>
 									<InputGroup.Text>Avg</InputGroup.Text>
 								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["avg"] * 100).toFixed(2) + "%" } />
+								<FormControl readOnly value={ (this.grossInterestRateAfterTenureStats["avg"] * 100).toFixed(2) + "%" } />
 								<InputGroup.Prepend>
 									<InputGroup.Text>High</InputGroup.Text>
 								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["high"] * 100).toFixed(2) + "%" } />
+								<FormControl readOnly value={ (this.grossInterestRateAfterTenureStats["high"] * 100).toFixed(2) + "%" } />
 								<InputGroup.Prepend>
 									<InputGroup.Text>Low</InputGroup.Text>
 								</InputGroup.Prepend>
-								<FormControl readOnly value={ (this.netInterestRateAfterTenureStats["low"] * 100).toFixed(2) + "%" } />
+								<FormControl readOnly value={ (this.grossInterestRateAfterTenureStats["low"] * 100).toFixed(2) + "%" } />
 							</InputGroup>
 						</Form.Group>						
 						<Form.Group>
@@ -514,7 +517,6 @@ class DashboardContainer extends React.Component {
                             <thead>
                                 <tr>
                                     <th className="align-middle">Gross % p.a.</th>
-                                    <th className="align-middle">Net % p.a.</th>
                                     <th className="align-middle">Frequency</th>
                                 </tr>
                             </thead>
@@ -523,7 +525,6 @@ class DashboardContainer extends React.Component {
 									Object.keys(this.interestRateDistribution).sort().map((grossInterestRate) => {
 										return <tr>
 											<td>{ (grossInterestRate * 100).toFixed(2) }%</td>
-											<td>{ (this.interestRateDistribution[grossInterestRate]["netInterestRate"] * 100).toFixed(2) }%</td>
 											<td>{ (this.interestRateDistribution[grossInterestRate]["frequency"]) }</td>
 										</tr>
 									})
