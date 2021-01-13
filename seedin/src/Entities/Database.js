@@ -72,7 +72,7 @@ class Database
             return this.importJsonVersion_1_0_0(toImportJson);
 
         // For those that has a version, we can start import as it is
-        if(toImportJson["version"].startsWith("1.2."))
+        if(toImportJson["version"].startsWith("1.2.") || toImportJson["version"].startsWith("1.3."))
             return this.importJsonVersion_1_2(toImportJson);
 
         return false;

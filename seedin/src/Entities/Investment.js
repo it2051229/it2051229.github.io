@@ -67,7 +67,7 @@ class Investment {
     calculateNetInterestRate(date) {
         var feeRate = 0.30;
 
-        if(date.properties["year"] >= 2021 && date.properties["month"] >= 1 && date.properties["day"] >= 8)
+        if(date.compareTo(new MyDate(2021, 1, 8)) >= 0)
             feeRate = 0.25;
 
         var netInterestRate = this.properties["grossInterestRate"] * (1 - feeRate);
