@@ -32,7 +32,7 @@ class NavigationBarComponent extends React.Component {
 
         return (
             <Navbar collapseOnSelect bg="dark" variant="dark" expand="md" fixed="top">
-				<Container fluid>
+				<Container>
                     <Navbar.Brand href="#/"><strong>Insider Trading</strong><sup>0.1.0</sup></Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">

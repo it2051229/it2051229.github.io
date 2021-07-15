@@ -4,6 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import DashboardComponent from "./Components/DashboardComponent";
+import TransactionComponent from "./Components/TransactionComponent";
+import StockComponent from "./Components/StockComponent";
 
 // Entry class of the program
 class App extends React.Component {
@@ -15,6 +17,8 @@ class App extends React.Component {
 				<Switch>
 					<Route exact path="/" component={DashboardComponent} />
 					<Route exact path="/dashboard" component={DashboardComponent} />
+					<Route exact path="/transaction" component={TransactionComponent} />
+					<Route exact path="/stock/:stock" component={StockComponent} />
 				</Switch>
 			</Router>
         );
