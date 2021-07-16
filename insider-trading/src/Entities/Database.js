@@ -12,7 +12,6 @@ class Database
         }
 
         this.stocks = JSON.parse(localStorage.getItem(this.databaseName));
-        console.log(this.stocks);
     }
 
     // Return the list of stock names
@@ -21,33 +20,48 @@ class Database
     }
 
     // Return the names of people related to a stock
-    getStockInsiders(stock) {
-        return Object.keys(this.stocks[stock]);
+    getStockInsiders(stockName) {
+        if(!(stockName in this.stocks))
+            return [];
+
+        return Object.keys(this.stocks[stockName]);
+    }
+
+    // Remove an insider data from a stock
+    removeStockInsider(stockName, insiderName) {
+        if(!(stockName in this.stocks))
+            return;
+        
+        delete this.stocks[stockName][insiderName];
+        this.persist();
     }
 
     // Return the list of transactions of a person of a specific stock
-    getInsiderTransactions(stock, person) {
-        return this.stocks[stock][person];
+    getInsiderTransactions(stockName, insiderName) {
+        if(!(stockName in this.stocks) || !(insiderName in this.stocks[stockName]))
+            return[];
+            
+        return this.stocks[stockName][insiderName];
     }
 
     // Delete the stock given the name
-    deleteStock(stock) {
-        delete this.stocks[stock];
+    deleteStock(stockName) {
+        delete this.stocks[stockName];
         this.persist();
     }
 
     // Add a new transaction to the database
-    addTransaction(stock, person, date, shares, type, price) {
+    addTransaction(stockName, insiderName, date, shares, type, price) {
         // Add the stock if it doesn't exist yet
-        if(!(stock in this.stocks))
-            this.stocks[stock] = {};
+        if(!(stockName in this.stocks))
+            this.stocks[stockName] = {};
 
         // Add the person if it doesn't exist yet in the stock
-        if(!(person in this.stocks[stock]))
-            this.stocks[stock][person] = []
+        if(!(insiderName in this.stocks[stockName]))
+            this.stocks[stockName][insiderName] = []
 
         // Add the transaction for the person
-        this.stocks[stock][person].push({ 
+        this.stocks[stockName][insiderName].push({ 
             "date": date,
             "shares": shares,
             "type": type,

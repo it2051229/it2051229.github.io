@@ -16,7 +16,7 @@ class TransactionComponent extends React.Component {
             "person": "",
             "date": "",
             "shares": "",
-            "type": "Buy",
+            "type": "BUY",
             "price": ""
         };
     }
@@ -24,15 +24,15 @@ class TransactionComponent extends React.Component {
     // Validate and add new transaction
     handleAddTransactionClick() {
         // Grab all entered data and sanitize them
-        let stock = this.state.stock.trim().toUpperCase();
-        let person = this.state.person.trim().toUpperCase();
+        let stockName = this.state.stock.trim().toUpperCase();
+        let insiderName = this.state.person.trim().toUpperCase();
         let date = this.state.date.trim();
         let shares = this.state.shares.trim().toUpperCase();
         let type = this.state.type.trim().toUpperCase();
         let price = this.state.price.trim().toUpperCase();
 
         // Validate that all fields are provided
-        if(stock === "" || person === "" || date === "" || shares === "" || price === "" || type === "") {
+        if(stockName === "" || insiderName === "" || date === "" || shares === "" || price === "" || type === "") {
             window.alert("All fields are required.");
             return;
         }
@@ -61,8 +61,29 @@ class TransactionComponent extends React.Component {
             return;
         }
 
-        // Add the stock to the database
-        this.database.addTransaction(stock, person, date, shares, type, price);
+        
+        if(type === "BUY") {
+            // Add the transaction to the database
+            this.database.addTransaction(stockName, insiderName, date, shares, type, price);
+        } else {
+            // Check if the insider will go to negative shares, delete if it goes negative
+            let totalShares = 0;
+
+            this.database.getInsiderTransactions(stockName, insiderName).forEach(transaction => {
+                if(transaction["type"] === "BUY")
+                    totalShares += transaction["shares"];
+                else
+                    totalShares -= transaction["shares"];
+            });
+
+            totalShares -= shares;
+
+            // Add the transaction as long as the insider has shares left, otherwise remove the insider
+            if(totalShares <= 0)
+                this.database.removeStockInsider(stockName, insiderName);
+            else
+                this.database.addTransaction(stockName, insiderName, date, shares, type, price);
+        }
 
         // Clear the fields for new entry
         this.setState({
@@ -78,6 +99,16 @@ class TransactionComponent extends React.Component {
 
     // Display the form
     render() {
+        // Build the data list for stock names
+        let stockNamesDataList = this.database.getStockNames().map((stockName) => {
+            return (<option>{stockName}</option>);
+        });
+
+        // Build the data list for insider names from a stock
+        let insidersDataList = this.database.getStockInsiders(this.state.stock).map((insider) => {
+            return (<option>{insider}</option>);
+        });
+
         return (
             <>
                 <NavigationBarComponent activeMenuName="Dashboard" />
@@ -88,11 +119,17 @@ class TransactionComponent extends React.Component {
                             <Form>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Stock</Form.Label>
-                                    <Form.Control type="text" value={this.state.stock} onChange={(e) => { this.setState({"stock": e.target.value}) }} />
+                                    <Form.Control list="stock-names" type="text" value={this.state.stock} onChange={(e) => { this.setState({"stock": e.target.value}) }} />
+                                    <datalist id="stock-names">
+                                        {stockNamesDataList}
+                                    </datalist>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Person</Form.Label>
-                                    <Form.Control type="text" value={this.state.person} onChange={(e) => { this.setState({"person": e.target.value}) }} />
+                                    <Form.Control list="insiders" type="text" value={this.state.person} onChange={(e) => { this.setState({"person": e.target.value}) }} />
+                                    <datalist id="insiders">
+                                        {insidersDataList}
+                                    </datalist>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Date of Transaction</Form.Label>

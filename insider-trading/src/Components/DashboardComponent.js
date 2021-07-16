@@ -30,8 +30,8 @@ class DashboardComponent extends React.Component {
                 let totalCost = 0;
                 
                 // For each stock calculate the total shares acquired, sold, and purchase cost
-                this.database.getStockInsiders(stockName).forEach((insider) => {              
-                    this.database.getInsiderTransactions(stockName, insider).forEach((transaction) => {
+                this.database.getStockInsiders(stockName).forEach((insiderName) => {              
+                    this.database.getInsiderTransactions(stockName, insiderName).forEach((transaction) => {
                         if(transaction["type"] === "BUY") {
                             sharesAcquired += transaction["shares"];
                             totalCost += transaction["shares"] * transaction["price"];
@@ -42,7 +42,6 @@ class DashboardComponent extends React.Component {
                 });
 
                 // Calculate the average cost per share
-                console.log(totalCost);
                 let averageCost = totalCost / sharesAcquired;
 
                 // Deduct the shares disposed
