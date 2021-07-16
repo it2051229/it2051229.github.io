@@ -93,7 +93,7 @@ class StockComponent extends React.Component {
             insiderAverageCost = insider["sharesAcquired"] > 0 ? insider["totalCost"] / insider["sharesAcquired"] : 0;
 
             return (
-                <tr key={insiderName}>
+                <tr key={insiderName} onClick={(e) => { window.location.href="#/insider/" + this.stockName + "/" + insiderName }}>
                     <td><strong>{insiderName}</strong></td>
                     <td>{ NumberUtils.formatCurrency(insiderAverageCost) }</td>
                     <td>{ NumberUtils.formatWithCommas(insider["sharesAcquired"]) }</td>
@@ -118,8 +118,8 @@ class StockComponent extends React.Component {
                         <Table responsive striped bordered hover variant="dark">
                             <thead>
                                 <tr>
-                                    <th className="align-middle">Average Cost Per Share</th>
-                                    <th className="align-middle">Total Insider Shares</th>
+                                    <th>Average Cost Per Share</th>
+                                    <th>Total Insider Shares</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -136,9 +136,9 @@ class StockComponent extends React.Component {
                             <Table responsive striped bordered hover variant="dark">
                                 <thead>
                                     <tr>
-                                        <th className="align-middle">Name</th>
-                                        <th className="align-middle">Average Cost Per Share</th>
-                                        <th className="align-middle">Total Shares</th>
+                                        <th>Name</th>
+                                        <th>Average Cost Per Share</th>
+                                        <th>Total Shares</th>
                                     </tr>
                                 </thead>
                                 <tbody>

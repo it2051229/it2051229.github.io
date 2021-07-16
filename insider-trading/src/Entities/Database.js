@@ -36,6 +36,27 @@ class Database
         this.persist();
     }
 
+    // Remove a transaction
+    removeTransaction(stockName, insiderName, transaction) {
+        if(!(stockName in this.stocks) || !(insiderName in this.stocks[stockName]))
+            return;
+        
+        let index = -1;
+
+        for(let i = 0; i < this.stocks[stockName][insiderName].length; i++) {
+            if(this.stocks[stockName][insiderName][i] === transaction) {
+                index = i;
+                break;
+            }
+        }
+
+        if(index == -1)
+            return;
+        
+        this.stocks[stockName][insiderName].splice(index, 1);
+        this.persist();
+    }
+
     // Return the list of transactions of a person of a specific stock
     getInsiderTransactions(stockName, insiderName) {
         if(!(stockName in this.stocks) || !(insiderName in this.stocks[stockName]))

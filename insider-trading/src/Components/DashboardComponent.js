@@ -76,9 +76,9 @@ class DashboardComponent extends React.Component {
                             <Table responsive striped bordered hover variant="dark">
                                 <thead>
                                     <tr>
-                                        <th className="align-middle">Stock</th>
-                                        <th className="align-middle">Average Cost Per Share</th>
-                                        <th className="align-middle">Total Insider Shares</th>
+                                        <th>Stock</th>
+                                        <th>Average Cost Per Share</th>
+                                        <th>Total Insider Shares</th>
                                     </tr>
                                 </thead>
                                 <tbody>{ stockTableRows }</tbody>
