@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Button, Row, Col, Form } from "react-bootstrap";
+import { Container, Button, Row, Col, Form, Alert } from "react-bootstrap";
 import NavigationBarComponent from "./NavigationBarComponent";
 import Database from "../Entities/Database";
 
@@ -97,6 +97,69 @@ class TransactionComponent extends React.Component {
         window.alert("Transaction created.");
     }
 
+    // Import CSV file and add it to the database
+    handleImportTransactionsClick(file) {
+        let fileReader = new FileReader();
+
+        fileReader.onload = () => {
+            try {
+                let numTransactionsAdded = 0;
+                
+                fileReader.result.split("\r\n").forEach((line) => {
+                    let tokens = line.split(",");
+                    
+                    try {
+                        let i = 0;
+                        let stockName = tokens[i++].trim().toUpperCase();                    
+                        let date = Date.parse(tokens[i++].trim());
+                        let insiderName = tokens[i++].trim().toUpperCase();
+                        let shares = parseInt(tokens[i++].trim());
+                        let type = tokens[i++].trim().toUpperCase();
+                        let price = parseFloat(tokens[i++].trim());
+
+                        if(stockName === "" 
+                            || isNaN(date) 
+                            || insiderName === "" 
+                            || isNaN(shares) || shares <= 0
+                            || (type !== "BUY" && type !== "SELL")
+                            || isNaN(price) || price <= 0)
+                            return;
+
+                        this.database.addTransaction(stockName, insiderName, date, shares, type, price);
+                        numTransactionsAdded++;
+                    } catch(err) {
+                    }
+                });
+
+                // Perform a clean-up by deleting those insiders who zeroed out in shares
+                if(numTransactionsAdded > 0) {
+                    this.database.getStockNames().forEach((stockName) => {
+                        this.database.getStockInsiders(stockName).forEach((insiderName) => {
+                            let insiderShares = 0;
+
+                            this.database.getInsiderTransactions(stockName, insiderName).forEach((transaction) => {
+                                if(transaction["type"] === "BUY")
+                                    insiderShares += transaction["shares"];
+                                else
+                                    insiderShares -= transaction["shares"];
+                            });
+
+                            if(insiderShares <= 0)
+                                this.database.removeStockInsider(stockName, insiderName);
+                        });
+                    });
+                }
+
+                window.alert(numTransactionsAdded + " transactions added.");
+            } catch(err) {
+                console.log(err);
+                window.alert("Invalid file.");
+            }
+        };
+
+        fileReader.readAsText(file);
+    }
+
     // Display the form
     render() {
         // Build the data list for stock names
@@ -153,6 +216,24 @@ class TransactionComponent extends React.Component {
                                 <Button variant="dark" href="#/dashboard">Back</Button>{" "}
                                 <Button variant="primary" onClick={(e) => { this.handleAddTransactionClick() }}>Add Transaction</Button>
                             </p>
+                        </Col>
+                        <Col md="6">
+                            <h2>or Import Transactions</h2>
+                            <p>
+                                Select a CSV (Comma Separated Values) file to import. This will not delete your old data but will add more to it.
+                                Make sure your CSV file follows the appropriate format (example):
+                            </p>
+                            <Alert variant="dark">
+                                <strong>Stock,Date,Person,Number of Shares,Trade,Price</strong><br />
+                                DMC,2021-02-10,MARIA CRISTINA C. GOTIANUN,2599431,BUY,5.56<br />
+                                DMC,2021-02-10,LUZ CONSUELO A. CONSUNJI,7798292,SELL,5.56 <br />
+                                ...
+                            </Alert>
+                            <Form>
+                                <Form.Group controlId="formFile" className="mb-3">
+                                    <Form.Control type="file" onChange={(e) => { this.handleImportTransactionsClick(e.target.files[0]) }} />
+                                </Form.Group>
+                            </Form>
                         </Col>
                     </Row>
                 </Container>

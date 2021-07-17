@@ -24,6 +24,15 @@ class InsiderComponent extends React.Component {
         this.insiderName = props.match.params.insider;
     }
 
+    // Delete the current insider
+    handleDeleteInsiderClick() {
+        if(!window.confirm("Are you sure you want to delete this insider?"))
+            return;
+        
+        this.database.removeStockInsider(this.stockName, this.insiderName);
+        window.location.href = "#/stock/" + this.stockName;
+    }
+
     // Delete a transaction
     handleTransactionCheckChange(event, transaction) {
         let transactions = this.state.transactions.slice();
@@ -51,7 +60,7 @@ class InsiderComponent extends React.Component {
 
     // Delete all selected transactions
     handleDeleteTransactionsClick() {
-        if(this.state.transactions.length == 0 || !window.confirm("Are you sure you want to delete the selected transaction(s)?"))
+        if(this.state.transactions.length === 0 || !window.confirm("Are you sure you want to delete the selected transaction(s)?"))
             return;
 
         this.state.transactions.forEach((transaction) => {
@@ -59,7 +68,7 @@ class InsiderComponent extends React.Component {
         });
 
         // If the insider has no transactions anymore then delete it and move back to the socks page
-        if(this.database.getInsiderTransactions(this.stockName, this.insiderName).length == 0) {
+        if(this.database.getInsiderTransactions(this.stockName, this.insiderName).length === 0) {
             this.database.removeStockInsider(this.stockName, this.insiderName);
             window.location.href = "#/stock/" + this.stockName;
             return;
@@ -82,6 +91,8 @@ class InsiderComponent extends React.Component {
         let sharesAcquired = 0;
         let sharesDisposed = 0;
         let totalCost = 0;
+        let highestSharePrice = -1;
+        let lowestSharePrice = -1;
         let transactions = this.database.getInsiderTransactions(this.stockName, this.insiderName);
         
         // Build the display for the insider's transactions
@@ -89,6 +100,12 @@ class InsiderComponent extends React.Component {
             if(transaction["type"] === "BUY") {
                 sharesAcquired += transaction["shares"];
                 totalCost += transaction["shares"] * transaction["price"];
+
+                if(highestSharePrice === -1 || transaction["price"] > highestSharePrice)
+                    highestSharePrice = transaction["price"];
+
+                if(lowestSharePrice === -1 || transaction["price"] < lowestSharePrice)
+                    lowestSharePrice = transaction["price"];
             } else {
                 sharesDisposed += transaction["shares"];
             }
@@ -132,10 +149,10 @@ class InsiderComponent extends React.Component {
                 <Container>
                     <Row>
                         <Col md="12">
-                            <h2>{ this.stockName }/{ this.insiderName }</h2>
+                            <h2>{ this.stockName } / { this.insiderName }</h2>
                             <p>
                                 <Button variant="dark" onClick={(e) => { window.location.href="#/stock/" + this.stockName }}>Back</Button>{" "}
-                                <Button variant="danger">Delete Insider</Button>
+                                <Button variant="danger" onClick={(e) => { this.handleDeleteInsiderClick(); }}>Delete Insider</Button>
                             </p>
                         </Col>
                     </Row>
@@ -144,12 +161,16 @@ class InsiderComponent extends React.Component {
                             <thead>
                                 <tr>
                                     <th>Average Cost Per Share</th>
+                                    <th>Highest Cost Per Share</th>
+                                    <th>Lowest Cost Per Share</th>
                                     <th>Total Insider Shares</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr key={this.insiderName}>
                                     <td>{ NumberUtils.formatCurrency(averageCost) }</td>
+                                    <td>{ NumberUtils.formatCurrency(highestSharePrice) }</td>
+                                    <td>{ NumberUtils.formatCurrency(lowestSharePrice) }</td>
                                     <td>{ NumberUtils.formatWithCommas(sharesAcquired) }</td>
                                 </tr>
                             </tbody>

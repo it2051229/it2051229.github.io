@@ -50,7 +50,7 @@ class Database
             }
         }
 
-        if(index == -1)
+        if(index === -1)
             return;
         
         this.stocks[stockName][insiderName].splice(index, 1);
@@ -95,7 +95,6 @@ class Database
     // Write the transactions to the local storage
     persist() {
         localStorage.setItem(this.databaseName, JSON.stringify(this.stocks));
-        console.log(this.stocks);
     }
 }
 

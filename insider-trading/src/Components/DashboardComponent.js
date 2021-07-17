@@ -18,6 +18,8 @@ class DashboardComponent extends React.Component {
             <td>...</td>
             <td>...</td>
             <td>...</td>
+            <td>...</td>
+            <td>...</td>
         </tr>
 
         let stockNames = this.database.getStockNames();
@@ -28,6 +30,9 @@ class DashboardComponent extends React.Component {
                 let sharesAcquired = 0;
                 let sharesDisposed = 0;
                 let totalCost = 0;
+
+                let highestSharePrice = -1;
+                let lowestSharePrice = -1;
                 
                 // For each stock calculate the total shares acquired, sold, and purchase cost
                 this.database.getStockInsiders(stockName).forEach((insiderName) => {              
@@ -35,6 +40,12 @@ class DashboardComponent extends React.Component {
                         if(transaction["type"] === "BUY") {
                             sharesAcquired += transaction["shares"];
                             totalCost += transaction["shares"] * transaction["price"];
+
+                            if(highestSharePrice === -1 || transaction["price"] > highestSharePrice)
+                                highestSharePrice = transaction["price"];
+                            
+                            if(lowestSharePrice === -1 || transaction["price"] < lowestSharePrice)
+                                lowestSharePrice = transaction["price"];
                         } else {
                             sharesDisposed += transaction["shares"];
                         }
@@ -55,6 +66,8 @@ class DashboardComponent extends React.Component {
                     <tr key={stockName} onClick={(e) => { window.location.href="#/stock/" + stockName; }}>
                         <td><strong>{ stockName }</strong></td>
                         <td>{ NumberUtils.formatCurrency(averageCost) }</td>
+                        <td>{ NumberUtils.formatCurrency(highestSharePrice) }</td>
+                        <td>{ NumberUtils.formatCurrency(lowestSharePrice) }</td>
                         <td>{ NumberUtils.formatWithCommas(sharesAcquired) }</td>
                     </tr>
                 );
@@ -68,7 +81,10 @@ class DashboardComponent extends React.Component {
                     <Row>
                         <Col md="12">
                             <h2>Dashboard</h2>
-                            <p><Button variant="primary" href="#/transaction">Add Transaction</Button></p>
+                            <p>
+                                <Button variant="primary" href="#/transaction">Add Transaction</Button>{" "}
+                                <Button variant="dark">Export Stocks to CSV File</Button>
+                            </p>
                         </Col>
                     </Row>
                     <Row>
@@ -78,6 +94,8 @@ class DashboardComponent extends React.Component {
                                     <tr>
                                         <th>Stock</th>
                                         <th>Average Cost Per Share</th>
+                                        <th>Highest Cost Per Share</th>
+                                        <th>Lowest Cost Per Share</th>
                                         <th>Total Insider Shares</th>
                                     </tr>
                                 </thead>

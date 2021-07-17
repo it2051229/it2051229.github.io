@@ -35,6 +35,8 @@ class StockComponent extends React.Component {
         let sharesAcquired = 0;
         let sharesDisposed = 0;
         let totalCost = 0;
+        let highestSharePrice = -1;
+        let lowestSharePrice = -1;
 
         let insiders = {};
 
@@ -45,7 +47,9 @@ class StockComponent extends React.Component {
                     insiders[insiderName] = {
                         "sharesAcquired": 0,
                         "sharesDisposed": 0,
-                        "totalCost": 0       
+                        "totalCost": 0,
+                        "highestSharePrice": -1,
+                        "lowestSharePrice": -1
                     };
                 }
 
@@ -56,9 +60,21 @@ class StockComponent extends React.Component {
                     sharesAcquired += transaction["shares"];
                     totalCost += transaction["shares"] * transaction["price"];
 
+                    if(highestSharePrice === -1 || transaction["price"] > highestSharePrice)
+                        highestSharePrice = transaction["price"];
+                    
+                    if(lowestSharePrice === -1 || transaction["price"] < lowestSharePrice)
+                        lowestSharePrice = transaction["price"];
+
                     // Specific insider data
                     insider["sharesAcquired"] += transaction["shares"];
                     insider["totalCost"] += transaction["shares"] * transaction["price"];
+
+                    if(insider["highestSharePrice"] === -1 || transaction["price"] > insider["highestSharePrice"])
+                        insider["highestSharePrice"] = transaction["price"];
+                    
+                    if(insider["lowestSharePrice"] === -1 || transaction["price"] < insider["lowestSharePrice"])
+                        insider["lowestSharePrice"] = transaction["price"];
                 } else {
                     // Over-all data
                     sharesDisposed += transaction["shares"];
@@ -96,6 +112,8 @@ class StockComponent extends React.Component {
                 <tr key={insiderName} onClick={(e) => { window.location.href="#/insider/" + this.stockName + "/" + insiderName }}>
                     <td><strong>{insiderName}</strong></td>
                     <td>{ NumberUtils.formatCurrency(insiderAverageCost) }</td>
+                    <td>{ NumberUtils.formatCurrency(insider["highestSharePrice"]) }</td>
+                    <td>{ NumberUtils.formatCurrency(insider["lowestSharePrice"]) }</td>
                     <td>{ NumberUtils.formatWithCommas(insider["sharesAcquired"]) }</td>
                 </tr>
             );
@@ -119,12 +137,16 @@ class StockComponent extends React.Component {
                             <thead>
                                 <tr>
                                     <th>Average Cost Per Share</th>
+                                    <th>Highest Cost Per Share</th>
+                                    <th>Lowest Cost Per Share</th>
                                     <th>Total Insider Shares</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr key={this.stockName}>
                                     <td>{ NumberUtils.formatCurrency(averageCost) } </td>
+                                    <td>{ NumberUtils.formatCurrency(highestSharePrice) }</td>
+                                    <td>{ NumberUtils.formatCurrency(lowestSharePrice) }</td>
                                     <td>{ NumberUtils.formatWithCommas(sharesAcquired) }</td>
                                 </tr>
                             </tbody>
@@ -138,6 +160,8 @@ class StockComponent extends React.Component {
                                     <tr>
                                         <th>Name</th>
                                         <th>Average Cost Per Share</th>
+                                        <th>Highest Cost Per Share</th>
+                                        <th>Lowest Cost Per Share</th>
                                         <th>Total Shares</th>
                                     </tr>
                                 </thead>
