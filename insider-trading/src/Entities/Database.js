@@ -6,11 +6,9 @@ class Database
 
         // Create the storage for our app if not yet created
         // localStorage.removeItem(this.databaseName);
-        if(!(this.databaseName in localStorage)) {
+        if(!(this.databaseName in localStorage))
             localStorage.setItem(this.databaseName, JSON.stringify({}));
-            console.log("New " + this.databaseName + " storage created.");
-        }
-
+        
         this.stocks = JSON.parse(localStorage.getItem(this.databaseName));
     }
 
@@ -92,9 +90,41 @@ class Database
         this.persist();        
     }
 
-    // Write the transactions to the local storage
+    // Write the stock transactions to the local storage
     persist() {
         localStorage.setItem(this.databaseName, JSON.stringify(this.stocks));
+    }
+
+    // Save the from date filter
+    saveFromDateFilter(date) {        
+        localStorage.setItem(this.databaseName + "-fromDate", date);
+    }
+
+    // Save the to date filter
+    saveToDateFilter(date) {
+        localStorage.setItem(this.databaseName + "-toDate", date);
+    }
+
+    // Return the from date filter
+    getFromDateFilter() {
+        if(this.databaseName + "-toDate" in localStorage)
+            return localStorage.getItem(this.databaseName + "-toDate");
+
+        return "";
+    }
+
+    // Return the to date filter
+    getToDateFilter() {
+        if(this.databaseName + "-fromDate" in localStorage)
+            return localStorage.getItem(this.databaseName + "-fromDate");
+
+        return "";
+    }
+
+    // Remove the date filters
+    clearDateFilter() {
+        delete localStorage[this.databaseName + "-fromDate"];
+        delete localStorage[this.databaseName + "-toDate"];
     }
 }
 

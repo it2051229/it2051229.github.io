@@ -105,7 +105,7 @@ class TransactionComponent extends React.Component {
             try {
                 let numTransactionsAdded = 0;
                 
-                fileReader.result.split("\r\n").forEach((line) => {
+                fileReader.result.split(/\r\n|\n/).forEach((line) => {
                     let tokens = line.split(",");
                     
                     try {
@@ -151,6 +151,7 @@ class TransactionComponent extends React.Component {
                 }
 
                 window.alert(numTransactionsAdded + " transactions added.");
+                window.location.href="#/dashboard";
             } catch(err) {
                 console.log(err);
                 window.alert("Invalid file.");

@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Container, Button, Row, Col } from "react-bootstrap";
+import { Table, Container, Button, Row, Col, Form } from "react-bootstrap";
 import NavigationBarComponent from "./NavigationBarComponent";
 import Database from "../Entities/Database";
 import NumberUtils from "../Entities/NumberUtils";
@@ -14,9 +14,14 @@ class StockComponent extends React.Component {
         // This view is only accessible if the stock name parameter is provided in the URL
         if(!("stock" in props.match.params))
             throw "Oh snap!";
-    
 
-        this.database = new Database();        
+        this.database = new Database();
+        
+        this.state = {
+            "fromDate": this.database.getFromDateFilter(),
+            "toDate": this.database.getToDateFilter()
+        };
+        
         this.stockName = props.match.params.stock;
     }
 
@@ -29,8 +34,69 @@ class StockComponent extends React.Component {
         window.location.href = "#/dashboard";
     }
 
+    // Export the transactions to a CSV file for this stock
+    handleExportTransactionsClick() {
+        let fromDate = null;
+        let toDate = null;
+
+        if(this.state.fromDate !== "") {
+            fromDate = new Date(this.state.fromDate);
+            fromDate.setHours(0, 0, 0, 0);
+            fromDate = fromDate.getTime();
+        }
+
+        if(this.state.toDate !== "") {
+            toDate = new Date(this.state.toDate);
+            toDate.setHours(0, 0, 0, 0);
+            toDate = toDate.getTime();
+        }
+
+        // Build the CSV
+        let csvData = "Stock,Date,Person,Number of Shares,Trade,Price\n";
+
+        this.database.getStockInsiders(this.stockName).forEach((insiderName) => {
+            this.database.getInsiderTransactions(this.stockName, insiderName).forEach((transaction) => {
+                // Apply filter
+                if(!(fromDate === null || toDate === null || (transaction["date"] >= fromDate && transaction["date"] <= toDate)))
+                    return;
+
+                let date = new Date(transaction["date"]);
+
+                let csvLine = this.stockName;
+                csvLine += "," + date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                csvLine += "," + insiderName;
+                csvLine += "," + transaction["shares"];
+                csvLine += "," + transaction["type"];
+                csvLine += "," + transaction["price"];
+
+                csvData += csvLine + "\n";
+            });
+        });
+        
+        // Download the file
+        let downloadLink = document.createElement("a");
+        downloadLink.download = this.stockName.toLowerCase().replace(/[^\w\s]|_/g, "").replace(/\s+/g, "") + "-insider-trading.csv";
+        downloadLink.href="data:text/plain;charset=utf-8," + encodeURIComponent(csvData);
+        downloadLink.click();
+    }
+
     // Render the display
     render() {
+        let fromDate = null;
+        let toDate = null;
+
+        if(this.state.fromDate !== "") {
+            fromDate = new Date(this.state.fromDate);
+            fromDate.setHours(0, 0, 0, 0);
+            fromDate = fromDate.getTime();
+        }
+
+        if(this.state.toDate !== "") {
+            toDate = new Date(this.state.toDate);
+            toDate.setHours(0, 0, 0, 0);
+            toDate = toDate.getTime();
+        }
+        
         // Initialize the display for the stock summary over-all
         let sharesAcquired = 0;
         let sharesDisposed = 0;
@@ -43,6 +109,10 @@ class StockComponent extends React.Component {
         // For each stock calculate the total shares acquired, sold, and purchase cost
         this.database.getStockInsiders(this.stockName).forEach((insiderName) => {              
             this.database.getInsiderTransactions(this.stockName, insiderName).forEach((transaction) => {
+                // Apply filter
+                if(!(fromDate === null || toDate === null || (transaction["date"] >= fromDate && transaction["date"] <= toDate)))
+                    return;
+
                 if(!(insiderName in insiders)) {
                     insiders[insiderName] = {
                         "sharesAcquired": 0,
@@ -84,6 +154,11 @@ class StockComponent extends React.Component {
                 }
             });
         });
+
+        if(sharesAcquired <= 0) {
+            highestSharePrice = 0;
+            lowestSharePrice = 0;
+        }
 
         // Calculate the average cost per share
         let averageCost = totalCost / sharesAcquired;
@@ -128,8 +203,37 @@ class StockComponent extends React.Component {
                             <h2>{ this.stockName }</h2>
                             <p>
                                 <Button variant="dark" onClick={(e) => { window.location.href="#/dashboard" }}>Back</Button>{" "}
+                                <Button variant="dark" onClick={(e) => { this.handleExportTransactionsClick(); }}>Export to CSV File</Button>{" "}
                                 <Button variant="danger" onClick={(e) => { this.handleDeleteStockClick(); }}>Delete Stock</Button>
                             </p>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md="2">
+                            <Form.Group className="mb-3">
+                                <Form.Text className="text-muted">From Date</Form.Text>
+                                <Form.Control type="date" placeholder="yyyy-mm-dd" value={this.state.fromDate} 
+                                    onChange={(e) => { 
+                                        this.database.saveFromDateFilter(e.target.value); 
+                                        this.setState({"fromDate": e.target.value});
+                                    }} />
+                            </Form.Group>
+                        </Col>
+                        <Col md="2">
+                            <Form.Group className="mb-3">
+                                <Form.Text className="text-muted">To Date</Form.Text>
+                                <Form.Control type="date" placeholder="yyyy-mm-dd" value={this.state.toDate} 
+                                    onChange={(e) => { 
+                                        this.database.saveToDateFilter(e.target.value);
+                                        this.setState({"toDate": e.target.value});
+                                    }} />
+                            </Form.Group>
+                        </Col>
+                        <Col md="2">
+                            <Form.Group className="mb-3">
+                                <br />
+                                <Button variant="dark" onClick={(e) => {this.database.clearDateFilter(); this.setState({"fromDate": "", "toDate": ""}); }}>Reset</Button>
+                            </Form.Group>                            
                         </Col>
                     </Row>
                     <Row>

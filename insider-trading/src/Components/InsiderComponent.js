@@ -14,12 +14,15 @@ class InsiderComponent extends React.Component {
         // This view is only accessible if the stock name and insider name is provided in the URL
         if(!("stock" in props.match.params) || !("insider" in props.match.params))
             throw "Oh snap!";
-        
-        this.state = {
-            "transactions": []
-        };
 
         this.database = new Database();
+
+        this.state = {
+            "transactions": [],
+            "fromDate": this.database.getFromDateFilter(),
+            "toDate": this.database.getToDateFilter()
+        };
+
         this.stockName = props.match.params.stock;
         this.insiderName = props.match.params.insider;
     }
@@ -77,6 +80,52 @@ class InsiderComponent extends React.Component {
         this.setState({"transactions": []});        
     }
 
+    // Export insider transactions of a stock
+    handleExportTransactionsClick() {
+        let fromDate = null;
+        let toDate = null;
+
+        if(this.state.fromDate !== "") {
+            fromDate = new Date(this.state.fromDate);
+            fromDate.setHours(0, 0, 0, 0);
+            fromDate = fromDate.getTime();
+        }
+
+        if(this.state.toDate !== "") {
+            toDate = new Date(this.state.toDate);
+            toDate.setHours(0, 0, 0, 0);
+            toDate = toDate.getTime();
+        }
+
+        // Build the CSV
+        let csvData = "Stock,Date,Person,Number of Shares,Trade,Price\n";
+
+        this.database.getInsiderTransactions(this.stockName, this.insiderName).forEach((transaction) => {
+            // Apply filter
+            if(!(fromDate === null || toDate === null || (transaction["date"] >= fromDate && transaction["date"] <= toDate)))
+                return;
+
+            let date = new Date(transaction["date"]);
+
+            let csvLine = this.stockName;
+            csvLine += "," + date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            csvLine += "," + this.insiderName;
+            csvLine += "," + transaction["shares"];
+            csvLine += "," + transaction["type"];
+            csvLine += "," + transaction["price"];
+
+            csvData += csvLine + "\n";
+        });
+        
+        // Download the file
+        let downloadLink = document.createElement("a");
+        downloadLink.download = this.insiderName.toLowerCase().replace(/[^\w\s]|_/g, "").replace(/\s+/g, "") + "-" 
+            + this.stockName.toLowerCase().replace(/[^\w\s]|_/g, "").replace(/\s+/g, "") 
+            + "-insider-trading.csv";
+        downloadLink.href="data:text/plain;charset=utf-8," + encodeURIComponent(csvData);
+        downloadLink.click();
+    }
+
     // Check if transaction is checked
     isTransactionChecked(transaction) {
         for(let i = 0; i < this.state.transactions.length; i++)
@@ -88,6 +137,21 @@ class InsiderComponent extends React.Component {
 
     // Render the display
     render() {
+        let fromDate = null;
+        let toDate = null;
+
+        if(this.state.fromDate !== "") {
+            fromDate = new Date(this.state.fromDate);
+            fromDate.setHours(0, 0, 0, 0);
+            fromDate = fromDate.getTime();
+        }
+
+        if(this.state.toDate !== "") {
+            toDate = new Date(this.state.toDate);
+            toDate.setHours(0, 0, 0, 0);
+            toDate = toDate.getTime();
+        }
+
         let sharesAcquired = 0;
         let sharesDisposed = 0;
         let totalCost = 0;
@@ -97,6 +161,10 @@ class InsiderComponent extends React.Component {
         
         // Build the display for the insider's transactions
         transactions.forEach((transaction) => {
+            // Apply filter
+            if(!(fromDate === null || toDate === null || (transaction["date"] >= fromDate && transaction["date"] <= toDate)))
+                return;
+
             if(transaction["type"] === "BUY") {
                 sharesAcquired += transaction["shares"];
                 totalCost += transaction["shares"] * transaction["price"];
@@ -127,6 +195,10 @@ class InsiderComponent extends React.Component {
         });
 
         let transactionTableRows = transactions.map((transaction) => {
+            // Apply filter
+            if(!(fromDate === null || toDate === null || (transaction["date"] >= fromDate && transaction["date"] <= toDate)))
+                return;
+            
             let date = new Date(transaction["date"]);
             
             return (
@@ -152,8 +224,37 @@ class InsiderComponent extends React.Component {
                             <h2>{ this.stockName } / { this.insiderName }</h2>
                             <p>
                                 <Button variant="dark" onClick={(e) => { window.location.href="#/stock/" + this.stockName }}>Back</Button>{" "}
+                                <Button variant="dark" onClick={(e) => { this.handleExportTransactionsClick(); }}>Export to CSV File</Button>{" "}
                                 <Button variant="danger" onClick={(e) => { this.handleDeleteInsiderClick(); }}>Delete Insider</Button>
                             </p>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md="2">
+                            <Form.Group className="mb-3">
+                                <Form.Text className="text-muted">From Date</Form.Text>
+                                <Form.Control type="date" placeholder="yyyy-mm-dd" value={this.state.fromDate} 
+                                    onChange={(e) => { 
+                                        this.database.saveFromDateFilter(e.target.value); 
+                                        this.setState({"fromDate": e.target.value});
+                                    }} />
+                            </Form.Group>
+                        </Col>
+                        <Col md="2">
+                            <Form.Group className="mb-3">
+                                <Form.Text className="text-muted">To Date</Form.Text>
+                                <Form.Control type="date" placeholder="yyyy-mm-dd" value={this.state.toDate} 
+                                    onChange={(e) => { 
+                                        this.database.saveToDateFilter(e.target.value);
+                                        this.setState({"toDate": e.target.value});
+                                    }} />
+                            </Form.Group>
+                        </Col>
+                        <Col md="2">
+                            <Form.Group className="mb-3">
+                                <br />
+                                <Button variant="dark" onClick={(e) => {this.database.clearDateFilter(); this.setState({"fromDate": "", "toDate": ""}); }}>Reset</Button>
+                            </Form.Group>                            
                         </Col>
                     </Row>
                     <Row>

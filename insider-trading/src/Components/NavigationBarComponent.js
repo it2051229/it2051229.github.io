@@ -12,6 +12,7 @@ class NavigationBarComponent extends React.Component {
     render() {
         const menus = [
             {"name": "Dashboard", "link": "#dashboard"},
+            {"name": "About", "link": "#about"}
         ];
 
         // Put the nav links in a list and show which is the active state

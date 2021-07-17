@@ -7,6 +7,7 @@ import DashboardComponent from "./Components/DashboardComponent";
 import TransactionComponent from "./Components/TransactionComponent";
 import StockComponent from "./Components/StockComponent";
 import InsiderComponent from "./Components/InsiderComponent";
+import AboutComponent from "./Components/AboutComponent";
 
 // Entry class of the program
 class App extends React.Component {
@@ -21,6 +22,7 @@ class App extends React.Component {
 					<Route exact path="/transaction" component={TransactionComponent} />
 					<Route exact path="/stock/:stock" component={StockComponent} />
 					<Route exact path="/insider/:stock/:insider" component={InsiderComponent} />
+					<Route exact path="/about" component={AboutComponent} />
 				</Switch>
 			</Router>
         );
